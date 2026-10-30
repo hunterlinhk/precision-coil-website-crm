@@ -1,0 +1,28 @@
+{
+  "name": "arcwind-coil-platform",
+  "version": "1.0.0",
+  "description": "Bilingual manufacturing website + CMS/CRM for a precision coil manufacturer",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seed": "node scripts/reset-db.mjs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
+    "better-sqlite3": "^13.0.3",
+    "next": "^15.5.28",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "5.9"
+  },
+  "private": true
+}

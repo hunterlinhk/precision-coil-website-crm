@@ -1,0 +1,45 @@
+import '@fontsource-variable/archivo/wdth.css';
+import '../site.css';
+import { notFound } from 'next/navigation';
+import type { Metadata, Viewport } from 'next';
+import { isLocale, site, type Locale } from '@/lib/site';
+import { Header, Footer } from '@/components/site/Chrome';
+import { RfqProvider, SourceTracker } from '@/components/site/client';
+import { orgJsonLd, JsonLd } from '@/lib/seo';
+
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const zh = locale === 'zh';
+  return {
+    metadataBase: new URL(site.url),
+    title: { default: zh ? `${site.brandZh} ${site.brand} | 精密线圈制造商` : `${site.brand} | Precision coil manufacturer`, template: zh ? `%s | ${site.brandZh}` : `%s | ${site.brand}` },
+    description: zh
+      ? 'VCM 线圈、空心线圈、骨架线圈、无线充电线圈、线性马达与无线充电器制造商，全球约 10% 的 VCM 线圈出自我们的产线。'
+      : 'Manufacturer of VCM coils, air-core and bobbin coils, wireless charging coils, linear motors and wireless chargers. About 10% of VCM coils shipped worldwide are wound on our lines.',
+    openGraph: { siteName: site.brand, locale: zh ? 'zh_CN' : 'en_US', type: 'website' },
+    icons: { icon: '/icon.svg' },
+  };
+}
+
+export const viewport: Viewport = { themeColor: '#12332f', width: 'device-width', initialScale: 1 };
+
+export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  if (!isLocale(locale)) notFound();
+  return (
+    <html lang={locale === 'zh' ? 'zh-CN' : 'en'}>
+      <body className={`site lang-${locale}`}>
+        <a href="#main" className="skip">{locale === 'zh' ? '跳到正文' : 'Skip to content'}</a>
+        <RfqProvider>
+          <Header locale={locale as Locale} />
+          <main id="main">{children}</main>
+          <Footer locale={locale as Locale} />
+        </RfqProvider>
+        <SourceTracker />
+        <JsonLd data={orgJsonLd(locale as Locale)} />
+      </body>
+    </html>
+  );
+}
