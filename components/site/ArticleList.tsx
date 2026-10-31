@@ -9,7 +9,7 @@ export const fmtDate = (s: string, locale: Locale) =>
 export function ArticleList({ articles, locale, variant }: { articles: Article[]; locale: Locale; variant?: 'rows' }) {
   const d = t(locale);
   return (
-    <ul className={variant === 'rows' ? 'article-rows' : 'article-grid'}>
+    <ul className={variant === 'rows' ? 'article-rows' : 'articles'}>
       {articles.map((a) => (
         <li key={a.slug}>
           <Link href={`/${locale}/resources/${a.slug}`} className="article-card">

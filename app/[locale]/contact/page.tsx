@@ -36,17 +36,17 @@ export default async function Page({ params, searchParams }: P) {
           <div className="box">
             <h2>{d.contact.direct}</h2>
             <p>
-              {zh ? '销售' : 'Sales'}: <a href={`mailto:${site.email}`}>{site.email}</a><br />
-              {zh ? '工程' : 'Engineering'}: <a href={`mailto:${site.engineeringEmail}`}>{site.engineeringEmail}</a><br />
-              {zh ? '电话' : 'Phone'}: {site.phone}<br />
-              WhatsApp / WeChat: {site.whatsapp}
+              <a href={`mailto:${site.email}`}>{site.email}</a><br />
+              <a href={`mailto:${site.engineeringEmail}`}>{site.engineeringEmail}</a><br />
+              {site.phone}<br />
+              WhatsApp / WeChat {site.whatsapp}
             </p>
           </div>
           <div className="box">
             <h2>{zh ? '工厂' : 'Plants'}</h2>
-            <address>{site.plants.map((p) => <span key={p.en} style={{ display: 'block', marginBottom: 8 }}>{p[locale]}</span>)}</address>
+            <address>{site.plants.map((p) => <span key={p.en} style={{ display: 'block', marginBottom: 10 }}>{p[locale]}</span>)}</address>
           </div>
-          <p style={{ fontSize: '0.88rem', color: 'var(--ink-3)' }}>{d.footer.privacy}</p>
+          <p className="muted" style={{ fontSize: 'var(--t-small)' }}>{d.footer.privacy}</p>
         </aside>
       </div>
     </>

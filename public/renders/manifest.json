@@ -1,0 +1,122 @@
+{
+ "aw-ac-rf0350": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-ac-tc0402": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-ac-vc1200": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-bb-rl1612": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-bb-sn0812": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-bb-sv2230": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-ch-q2m15": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-ch-st3": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-lm-x0835": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-lm-z0825": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-vcm-af0806": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-vcm-ois1210": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-vcm-pr1604": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-wc-mpp50": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-wc-rx43": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "aw-wc-wr20": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "exploded": {
+  "w": 1600,
+  "h": 1861,
+  "xl": false
+ },
+ "family-vcm": {
+  "w": 1600,
+  "h": 1200,
+  "xl": false
+ },
+ "hero-af": {
+  "w": 1600,
+  "h": 1280,
+  "xl": false
+ },
+ "macro-turns": {
+  "w": 1600,
+  "h": 900,
+  "xl": true
+ },
+ "section": {
+  "w": 1600,
+  "h": 1200,
+  "xl": true
+ },
+ "spool": {
+  "w": 1600,
+  "h": 1300,
+  "xl": false
+ },
+ "tray": {
+  "w": 1600,
+  "h": 1000,
+  "xl": true
+ },
+ "winding": {
+  "w": 1600,
+  "h": 1778,
+  "xl": true
+ }
+}

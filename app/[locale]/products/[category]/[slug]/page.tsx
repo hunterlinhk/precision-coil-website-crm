@@ -3,16 +3,18 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { site, type Locale } from '@/lib/site';
 import { t, L } from '@/lib/i18n';
-import { getProduct, getCategory, articlesForProduct, type Product } from '@/lib/content';
+import { getProduct, getCategory, getProducts, articlesForProduct, type Product } from '@/lib/content';
 import { getApplication } from '@/lib/applications';
 import { currentUser, can } from '@/lib/auth';
 import { Markdown } from '@/lib/markdown';
+import { productRenderName } from '@/lib/renders';
 import { alternates, JsonLd, productJsonLd, faqJsonLd, breadcrumbJsonLd } from '@/lib/seo';
-import { ProductArt } from '@/components/site/ProductArt';
 import { DimensionDrawing } from '@/components/site/DimensionDrawing';
-import { FigureTabs } from '@/components/site/FigureTabs';
+import { Render } from '@/components/site/Render';
+import { Stage } from '@/components/site/Stage';
 import { AddToRfq } from '@/components/site/client';
 import { ArticleList, Breadcrumbs } from '@/components/site/ArticleList';
+import { MiniProducts } from '@/components/site/MiniProducts';
 
 type P = { params: Promise<{ locale: Locale; category: string; slug: string }>; searchParams: Promise<{ preview?: string }> };
 
@@ -50,6 +52,20 @@ function productFaq(p: Product, locale: Locale): [string, string][] {
   ];
 }
 
+// The four values a buyer scans first, pulled from the spec list when present.
+function keyFigures(p: Product, locale: Locale) {
+  const want = ['outline', 'od', 'size', 'height', 'thickness', 'wire', 'resistance', 'inductance', 'f0', 'output', 'impedance', 'voltage'];
+  const picked = want.map((k) => p.specs.find((s) => s.k === k)).filter(Boolean).slice(0, 4) as Product['specs'];
+  return picked.map((s) => {
+    let label = locale === 'zh' ? s.zh : s.en;
+    let value = s.v, unit = s.u || '';
+    // "0.040 mm self-bonding" → value 0.040, unit mm, note moves to the label
+    const m = !unit && s.v.match(/^([\d.,\s×±+−–-]+?)\s*(mm|Ω|µH|nH|mH|W|V|Hz|G)\b\s*(.*)$/);
+    if (m) { value = m[1].trim(); unit = m[2]; if (m[3]) label = `${label}, ${m[3]}`; }
+    return { label, value, unit };
+  });
+}
+
 export default async function ProductPage({ params, searchParams }: P) {
   const { locale, category, slug } = await params;
   const preview = (await searchParams).preview;
@@ -57,94 +73,110 @@ export default async function ProductPage({ params, searchParams }: P) {
   if (!p || p.category_slug !== category) notFound();
   const c = getCategory(category)!;
   const d = t(locale);
+  const zh = locale === 'zh';
   const base = `/${locale}`;
   const url = `${site.url}${base}/products/${category}/${slug}`;
   const related = articlesForProduct(slug).slice(0, 3);
+  const siblings = getProducts({ category }).filter((x) => x.slug !== slug).slice(0, 3);
   const faq = productFaq(p, locale);
+  const figs = keyFigures(p, locale);
   const rfqItem = { model: p.model, slug: p.slug, category: p.category_slug, name_en: p.name_en, name_zh: p.name_zh };
-
-  const tabs = [
-    { label: d.products.drawing, node: <DimensionDrawing dims={p.dims} model={p.model} /> },
-    ...p.images.map((img, i) => ({ label: `${locale === 'zh' ? '图片' : 'Photo'} ${i + 1}`, node: <img src={`/api/media/${img.id}`} alt={`${p.model} ${img.name}`} /> })),
-    { label: locale === 'zh' ? '示意图' : 'Illustration', node: <ProductArt dims={p.dims} title={p.model} /> },
-  ];
+  const photo = p.images[0]
+    ? <img src={`/api/media/${p.images[0].id}`} alt={`${p.model} ${p.images[0].name}`} />
+    : <Render name={productRenderName(p)} alt={`${p.model} ${L(p, 'name', locale)}`} sizes="(max-width: 980px) 100vw, 58vw" priority />;
 
   return (
     <>
       {p.status !== 'published' && <div className="draft-banner">{d.products.draftBanner}</div>}
-      <div className="wrap">
-        <div className="pd-head">
-          <div>
-            <Breadcrumbs items={[[d.common.home, base], [d.nav.products, `${base}/products`], [L(c, 'name', locale), `${base}/products/${category}`], [p.model]]} />
+      <div className="wrap" style={{ paddingTop: 'clamp(24px, 3vw, 40px)' }}>
+        <Breadcrumbs items={[[d.common.home, base], [d.nav.products, `${base}/products`], [L(c, 'name', locale), `${base}/products/${category}`], [p.model]]} />
+        <div className="pd">
+          <div className="pd-stage">
+            <Stage photo={photo} drawing={<DimensionDrawing dims={p.dims} model={p.model} />} dims={p.dims} slug={p.slug}
+              labels={zh
+                ? { photo: '图片', model: '3D', drawing: '尺寸图', hint: '拖动旋转，滚轮缩放', viewer: `${p.model} 三维模型` }
+                : { photo: 'Photo', model: '3D', drawing: 'Drawing', hint: 'Drag to rotate, scroll to zoom', viewer: `${p.model} 3D model` }} />
+          </div>
+          <div className="pd-info">
+            <Link href={`${base}/products/${category}`} className="pd-family">{L(c, 'name', locale)}</Link>
             <h1>
               <span className="pd-model">{p.model}</span>
-              <span className="pd-name" style={{ display: 'block' }}>{L(p, 'name', locale)}</span>
+              <span className="pd-name">{L(p, 'name', locale)}</span>
             </h1>
             <p className="pd-summary">{L(p, 'summary', locale)}</p>
-          </div>
-          <div className="pd-actions">
-            <AddToRfq item={rfqItem} labels={{ add: d.products.addRfq, added: d.products.inRfq }} />
-            <Link href={`${base}/contact?type=sample&model=${encodeURIComponent(p.model)}`} className="btn btn-ink">{d.products.requestSample}</Link>
-            <Link href={`${base}/products/${category}/${slug}/datasheet`} className="btn btn-line">{d.products.datasheet}</Link>
+            <dl className="keyfigs">
+              {figs.map((f) => <div key={f.label}><dt>{f.label}</dt><dd className={f.value.length > 9 ? 'long' : undefined}>{f.value}{f.unit && <small>{f.unit}</small>}</dd></div>)}
+            </dl>
+            <div className="pd-actions">
+              <AddToRfq item={rfqItem} labels={{ add: d.products.addRfq, added: d.products.inRfq }} />
+              <Link href={`${base}/contact?type=sample&model=${encodeURIComponent(p.model)}`} className="btn btn-line">{d.products.requestSample}</Link>
+              <Link href={`${base}/products/${category}/${slug}/datasheet`} className="btn btn-line">{d.products.datasheet}</Link>
+            </div>
+            <p className="pd-meta">
+              <span>{zh ? '样品 10 件起' : 'Samples from 10 pcs'}</span>
+              <span>{zh ? '首样 1–3 周' : 'First articles in 1–3 weeks'}</span>
+              <a href="#custom">{d.products.custom}</a>
+            </p>
           </div>
         </div>
+      </div>
 
-        <div className="pd-body">
-          <FigureTabs tabs={tabs} />
-          <div className="pd-specs">
-            <h2>{d.products.specs}</h2>
+      <div className="wrap">
+        <section className="spec-block" aria-labelledby="specs">
+          <h2 id="specs" className="h2">{d.products.specs}</h2>
+          <div className="spec-body">
             <table className="spec-table">
-              <tbody>
-                {p.specs.map((s) => (
-                  <tr key={s.k}><th scope="row">{locale === 'zh' ? s.zh : s.en}</th><td>{s.v}{s.u && <small>{s.u}</small>}</td></tr>
-                ))}
-              </tbody>
+              <tbody>{p.specs.map((s) => <tr key={s.k}><th scope="row">{zh ? s.zh : s.en}</th><td>{s.v}{s.u && <small>{s.u}</small>}</td></tr>)}</tbody>
             </table>
             <p className="spec-note">{d.products.unitsNote}</p>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <div className="wrap">
-        <div className="pd-sections">
-          <div>
+        <section className="spec-block" aria-labelledby="about">
+          <h2 id="about" className="h2">{zh ? '说明' : 'About this part'}</h2>
+          <div className="spec-body aside-stack">
             <div className="prose"><Markdown source={L(p, 'body', locale)} /></div>
-            <div className="pd-section" style={{ marginTop: 48 }}>
-              <h2>{d.products.faq}</h2>
-              <dl className="faq">{faq.map(([q, a]) => <div key={q}><dt>{q}</dt><dd>{a}</dd></div>)}</dl>
+            <div className="custom-box" id="custom">
+              <h3>{d.products.custom}</h3>
+              <p>{L(p, 'custom', locale)}</p>
+              <Link href={`${base}/contact?type=drawing&model=${encodeURIComponent(p.model)}`} className="btn btn-light">{d.products.askEngineer}</Link>
+            </div>
+            <div className="split" style={{ gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+              {p.applications.length > 0 && (
+                <div>
+                  <h3 className="label" style={{ fontSize: 'var(--t-small)', fontWeight: 500, color: 'var(--muted)', marginBottom: 14 }}>{d.products.apps}</h3>
+                  <div className="chips">{p.applications.map((a) => { const app = getApplication(a); return app && <Link key={a} href={`${base}/applications/${a}`}>{L(app, 'name', locale)}</Link>; })}</div>
+                </div>
+              )}
+              <div>
+                <h3 className="label" style={{ fontSize: 'var(--t-small)', fontWeight: 500, color: 'var(--muted)', marginBottom: 14 }}>{d.products.docs}</h3>
+                <ul className="doc-list">
+                  <li><Link href={`${base}/products/${category}/${slug}/datasheet`}><DocIcon />{d.products.datasheet}<small>PDF</small></Link></li>
+                  {p.files.map((f) => <li key={f.id}><a href={`/api/media/${f.id}`} download={f.name}><DocIcon />{f.name}<small>{f.size ? `${Math.max(1, Math.round(f.size / 1024))} KB` : 'PDF'}</small></a></li>)}
+                </ul>
+              </div>
             </div>
           </div>
-          <aside className="pd-aside">
-            <div className="custom-box">
-              <h2>{d.products.custom}</h2>
-              <p>{L(p, 'custom', locale)}</p>
-              <Link href={`${base}/contact?type=drawing&model=${encodeURIComponent(p.model)}`} className="btn btn-copper">{d.products.askEngineer}</Link>
-            </div>
-            {p.applications.length > 0 && (
-              <div className="pd-section">
-                <h2>{d.products.apps}</h2>
-                <div className="chip-list">
-                  {p.applications.map((a) => { const app = getApplication(a); return app && <Link key={a} href={`${base}/applications/${a}`}>{L(app, 'name', locale)}</Link>; })}
-                </div>
-              </div>
-            )}
-            <div className="pd-section">
-              <h2>{d.products.docs}</h2>
-              <ul className="doc-list">
-                <li><Link href={`${base}/products/${category}/${slug}/datasheet`}><DocIcon />{d.products.datasheet}<small>HTML / PDF</small></Link></li>
-                {p.files.map((f) => (
-                  <li key={f.id}><a href={`/api/media/${f.id}`} download={f.name}><DocIcon />{f.name}<small>{f.size ? `${Math.max(1, Math.round(f.size / 1024))} KB` : 'PDF'}</small></a></li>
-                ))}
-              </ul>
-            </div>
-          </aside>
-        </div>
+        </section>
+
+        <section className="spec-block" aria-labelledby="faq">
+          <h2 id="faq" className="h2">{d.products.faq}</h2>
+          <dl className="faq spec-body">{faq.map(([q, a]) => <div key={q}><dt>{q}</dt><dd>{a}</dd></div>)}</dl>
+        </section>
       </div>
 
-      {related.length > 0 && (
-        <section className="section section-tint">
+      {siblings.length > 0 && (
+        <section className="section sweep">
           <div className="wrap">
-            <h2 className="h2" style={{ marginBottom: 32 }}>{d.products.related}</h2>
+            <header className="head"><h2 className="h2">{zh ? `同系列：${L(c, 'name', locale)}` : `More ${L(c, 'name', locale)}`}</h2></header>
+            <MiniProducts products={siblings} locale={locale} />
+          </div>
+        </section>
+      )}
+      {related.length > 0 && (
+        <section className="section">
+          <div className="wrap">
+            <header className="head"><h2 className="h2">{d.products.related}</h2></header>
             <ArticleList articles={related} locale={locale} />
           </div>
         </section>
@@ -155,5 +187,5 @@ export default async function ProductPage({ params, searchParams }: P) {
 }
 
 function DocIcon() {
-  return <svg viewBox="0 0 18 22" aria-hidden="true"><path d="M1 1h11l5 5v15H1z M12 1v5h5" fill="none" stroke="currentColor" strokeWidth="1.4" /><path d="M4 11h10M4 14h10M4 17h6" stroke="currentColor" strokeWidth="1.2" /></svg>;
+  return <svg viewBox="0 0 16 20" aria-hidden="true"><path d="M1 1h9l5 5v13H1z M10 1v5h5" fill="none" stroke="currentColor" strokeWidth="1.2" /></svg>;
 }

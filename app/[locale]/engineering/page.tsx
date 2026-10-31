@@ -4,6 +4,8 @@ import type { Locale } from '@/lib/site';
 import { t } from '@/lib/i18n';
 import { alternates, JsonLd, faqJsonLd } from '@/lib/seo';
 import { Breadcrumbs } from '@/components/site/ArticleList';
+import { Gantt } from '@/components/site/Gantt';
+import { DimensionDrawing } from '@/components/site/DimensionDrawing';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -44,20 +46,25 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
     <>
       <div className="wrap page-head">
         <Breadcrumbs items={[[d.common.home, base], [d.nav.engineering]]} />
-        <h1 className="h1">{d.eng.title}</h1>
-        <p className="lead">{d.eng.lead}</p>
-        <div style={{ display: 'flex', gap: 12, marginTop: 28, flexWrap: 'wrap' }}>
-          <Link href={`${base}/contact?type=drawing`} className="btn btn-ink">{d.eng.brief}</Link>
+        <div className="cat-hero">
+          <div className="cat-hero-copy">
+            <h1 className="h1">{d.eng.title}</h1>
+            <p className="lead">{d.eng.lead}</p>
+            <div style={{ display: 'flex', gap: 12, marginTop: 36, flexWrap: 'wrap' }}>
+              <Link href={`${base}/contact?type=drawing`} className="btn btn-solid">{d.eng.brief}</Link>
+            </div>
+          </div>
+          <div className="cat-hero-art" style={{ background: '#fff', padding: '4%' }}><DimensionDrawing dims={{ shape: 'racetrack', L: 8, W: 6, iL: 5.2, iW: 3.2, H: 0.9 }} model="AW-VCM-AF0806" /></div>
         </div>
       </div>
 
-      <section className="section">
-        <div className="wrap two-col">
-          <div>
+      <section className="section tight">
+        <div className="wrap split">
+          <div className="split-l">
             <h2 className="h2">{d.eng.envelope}</h2>
-            <p style={{ marginTop: 16, color: 'var(--ink-2)' }}>{d.eng.envelopeLead}</p>
+            <p className="muted" style={{ marginTop: 20, maxWidth: '24em' }}>{d.eng.envelopeLead}</p>
           </div>
-          <table className="envelope">
+          <table className="envelope split-r">
             <tbody>
               {ranged.map(([label, text, lo, hi, min, max]) => (
                 <tr key={label}>
@@ -71,9 +78,9 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
         </div>
       </section>
 
-      <section className="section section-tint">
+      <section className="section sweep">
         <div className="wrap">
-          <h2 className="h2" style={{ marginBottom: 32 }}>{d.eng.models}</h2>
+          <header className="head"><h2 className="h2">{d.eng.models}</h2></header>
           <div className="models">
             {[d.eng.oem, d.eng.odm, d.eng.platform].map(([h, p]) => <div key={h}><h3>{h}</h3><p>{p}</p></div>)}
           </div>
@@ -82,32 +89,26 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 
       <section className="section">
         <div className="wrap">
-          <header className="section-head split" style={{ marginBottom: 0 }}>
+          <header className="head">
             <h2 className="h2">{d.eng.process}</h2>
-            <p className="lead">{d.eng.processLead}</p>
+            <div className="head-aside"><p className="muted">{d.eng.processLead}</p></div>
           </header>
-          <ol className="timeline">
-            {d.eng.steps.map(([h, p, time]) => (
-              <li key={h}><span className="tl-time">{time}</span><h3>{h}</h3><p>{p}</p></li>
-            ))}
-          </ol>
+          <Gantt locale={locale} />
         </div>
       </section>
 
-      <section className="section section-dark">
-        <div className="wrap two-col">
-          <h2 className="h2" style={{ color: '#fff' }}>{d.eng.brief}</h2>
-          <div>
-            <p className="lead" style={{ color: 'var(--on-enamel-2)' }}>{d.eng.briefLead}</p>
-            <Link href={`${base}/contact?type=drawing`} className="btn btn-copper" style={{ marginTop: 28 }}>{d.home.ctaDrawing}</Link>
-          </div>
+      <section className="section tight">
+        <div className="wrap split">
+          <h2 className="h3 split-l">{zh ? '常见问题' : 'Common questions'}</h2>
+          <dl className="faq split-r">{faq.map(([q, a]) => <div key={q}><dt>{q}</dt><dd>{a}</dd></div>)}</dl>
         </div>
       </section>
 
-      <section className="section">
-        <div className="wrap faq-wrap">
-          <h2 className="h3">{zh ? '常见问题' : 'Common questions'}</h2>
-          <dl className="faq">{faq.map(([q, a]) => <div key={q}><dt>{q}</dt><dd>{a}</dd></div>)}</dl>
+      <section className="section dark closing">
+        <div className="wrap">
+          <h2 className="display">{d.eng.brief}</h2>
+          <p className="lead">{d.eng.briefLead}</p>
+          <div className="closing-actions"><Link href={`${base}/contact?type=drawing`} className="btn btn-light">{d.home.ctaDrawing}</Link></div>
         </div>
       </section>
       <JsonLd data={faqJsonLd(faq)} />

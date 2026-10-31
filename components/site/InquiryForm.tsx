@@ -76,7 +76,7 @@ export function InquiryForm({ locale, d, initialType, model, topic }: { locale: 
         <h2>{d.done}</h2>
         <p>{d.doneLead} <span className="ref">{ref}</span></p>
         <p>{d.doneNext}</p>
-        <Link href={`/${locale}/products`} className="btn btn-ghost-light" style={{ marginTop: 24 }}>{zh ? '继续浏览产品' : 'Keep browsing products'}</Link>
+        <Link href={`/${locale}/products`} className="btn btn-light" style={{ marginTop: 28 }}>{zh ? '继续浏览产品' : 'Keep browsing products'}</Link>
       </div>
     );
   }
@@ -98,10 +98,11 @@ export function InquiryForm({ locale, d, initialType, model, topic }: { locale: 
       {(type === 'quote' || type === 'sample') && (
         <fieldset>
           <legend>{d.list}</legend>
-          {items.length === 0 ? <p className="rfq-empty">{d.listEmpty} <Link href={`/${locale}/products`} className="text-link">{zh ? '产品目录' : 'Catalogue'}</Link></p> : (
+          {items.length === 0 ? <p className="rfq-empty">{d.listEmpty} <Link href={`/${locale}/products`} className="link">{zh ? '产品目录' : 'Catalogue'}</Link></p> : (
             <ul className="rfq-lines">
               {items.map((i) => (
                 <li key={i.model} className="rfq-line">
+                  <span className="thumb"><img src={`/renders/${i.slug}-sm.webp`} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }} /></span>
                   <div><strong>{i.model}</strong><span>{zh ? i.name_zh : i.name_en}</span></div>
                   <input aria-label={`${i.model} ${d.qty}`} placeholder={type === 'sample' ? (zh ? '样品数量' : 'Sample qty') : d.qty} value={i.qty} onChange={(e) => setQty(i.model, e.target.value)} inputMode="numeric" />
                   <button type="button" onClick={() => remove(i.model)}>{d.remove}</button>
@@ -168,7 +169,7 @@ export function InquiryForm({ locale, d, initialType, model, topic }: { locale: 
       {/* Spam trap: humans never see or fill this. */}
       <div aria-hidden="true" style={{ position: 'absolute', left: '-5000px' }}><input name="website" tabIndex={-1} autoComplete="off" /></div>
 
-      <div><button type="submit" className="btn btn-ink" disabled={state === 'sending'}>{state === 'sending' ? d.sending : d.submit}</button></div>
+      <div><button type="submit" className="btn btn-solid" disabled={state === 'sending'}>{state === 'sending' ? d.sending : d.submit}</button></div>
     </form>
   );
 }

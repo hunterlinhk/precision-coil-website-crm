@@ -28,14 +28,14 @@ export default async function Page({ params, searchParams }: P) {
         <Breadcrumbs items={[[d.common.home, base], [d.res.title]]} />
         <h1 className="h1">{d.res.title}</h1>
         <p className="lead">{d.res.lead}</p>
-        <nav className="cat-tabs" aria-label={d.res.title}>
-          {tabs.map(([k, label]) => (
-            <Link key={label} href={k ? `${base}/resources?type=${k}` : `${base}/resources`} aria-current={kind === k ? 'page' : undefined}>{label}</Link>
-          ))}
-        </nav>
       </div>
-      <div className="wrap" style={{ paddingBottom: 96, paddingTop: 16 }}>
-        <ArticleList articles={articles} locale={locale} variant="rows" />
+      <div className="wrap" style={{ paddingBottom: 'var(--section)' }}>
+        <div className="catbar" style={{ position: 'static' }}>
+          <nav className="pills" aria-label={d.res.title}>
+            {tabs.map(([k, label]) => <Link key={label} href={k ? `${base}/resources?type=${k}` : `${base}/resources`} aria-current={kind === k ? 'page' : undefined}>{label}</Link>)}
+          </nav>
+        </div>
+        <div style={{ marginTop: 32 }}><ArticleList articles={articles} locale={locale} variant="rows" /></div>
       </div>
     </>
   );

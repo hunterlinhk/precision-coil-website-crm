@@ -42,13 +42,23 @@ export function RfqCount({ locale, label }: { locale: string; label: string }) {
   );
 }
 
-export function AddToRfq({ item, labels, size }: { item: Omit<RfqItem, 'qty'>; labels: { add: string; added: string }; size?: 'sm' }) {
+export function AddToRfq({ item, labels, size, variant }: { item: Omit<RfqItem, 'qty'>; labels: { add: string; added: string }; size?: 'sm'; variant?: 'icon' }) {
   const { items, add, remove, ready } = useRfq();
   const inList = items.some((x) => x.model === item.model);
+  if (variant === 'icon') {
+    return (
+      <button type="button" className="icon-btn" aria-pressed={inList} disabled={!ready} title={inList ? labels.added : labels.add}
+        aria-label={`${inList ? labels.added : labels.add}: ${item.model}`} onClick={() => (inList ? remove(item.model) : add({ ...item, qty: '' }))}>
+        {inList
+          ? <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="1.6" /></svg>
+          : <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v11M2.5 8h11" fill="none" stroke="currentColor" strokeWidth="1.4" /></svg>}
+      </button>
+    );
+  }
   return (
     <button
       type="button"
-      className={`btn ${inList ? 'btn-done' : 'btn-line'} ${size === 'sm' ? 'btn-sm' : ''}`}
+      className={`btn ${inList ? 'btn-done' : 'btn-solid'} ${size === 'sm' ? 'btn-sm' : ''}`}
       aria-pressed={inList}
       disabled={!ready}
       onClick={() => (inList ? remove(item.model) : add({ ...item, qty: '' }))}
@@ -104,6 +114,18 @@ export function SourceTracker() {
       const utm = ['utm_source', 'utm_medium', 'utm_campaign'].map((k) => (u.searchParams.get(k) ? `${k}=${u.searchParams.get(k)}` : '')).filter(Boolean).join('&');
       localStorage.setItem('aw_src', JSON.stringify({ referrer: document.referrer || '', landing: u.pathname, utm, at: Date.now() }));
     } catch { /* storage unavailable */ }
+  }, []);
+  return null;
+}
+
+// Adds a hairline under the sticky header once the page has scrolled.
+export function HeaderScroll() {
+  useEffect(() => {
+    const h = document.querySelector('.site-header');
+    const on = () => h?.toggleAttribute('data-scrolled', window.scrollY > 8);
+    on();
+    window.addEventListener('scroll', on, { passive: true });
+    return () => window.removeEventListener('scroll', on);
   }, []);
   return null;
 }

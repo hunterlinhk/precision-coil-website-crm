@@ -1,4 +1,8 @@
-import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource/barlow/200.css';
+import '@fontsource/barlow/300.css';
+import '@fontsource/barlow/400.css';
+import '@fontsource/barlow/500.css';
+import '@fontsource/barlow/600.css';
 import '../site.css';
 import { notFound } from 'next/navigation';
 import type { Metadata, Viewport } from 'next';
@@ -23,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export const viewport: Viewport = { themeColor: '#12332f', width: 'device-width', initialScale: 1 };
+export const viewport: Viewport = { themeColor: '#f2f2f0', width: 'device-width', initialScale: 1 };
 
 export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
   const { locale } = await params;

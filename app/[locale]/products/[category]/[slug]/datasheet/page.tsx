@@ -6,6 +6,8 @@ import { t, L } from '@/lib/i18n';
 import { getProduct } from '@/lib/content';
 import { DimensionDrawing } from '@/components/site/DimensionDrawing';
 import { PrintButton } from '@/components/site/PrintButton';
+import { Render } from '@/components/site/Render';
+import { productRenderName } from '@/lib/renders';
 
 type P = { params: Promise<{ locale: Locale; category: string; slug: string }> };
 
@@ -41,6 +43,7 @@ export default async function Datasheet({ params }: P) {
       </header>
       <div className="ds-grid">
         <div>
+          <div className="ds-art"><Render name={productRenderName(p)} alt={p.model} sizes="480px" priority /></div>
           <DimensionDrawing dims={p.dims} model={p.model} />
           <h2 className="h3" style={{ fontSize: '1.1rem', marginTop: 20 }}>{d.products.custom}</h2>
           <p style={{ color: 'var(--ink-2)', marginTop: 6 }}>{L(p, 'custom', locale)}</p>

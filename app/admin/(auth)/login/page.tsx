@@ -11,9 +11,9 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
   return (
     <div className="login">
       <div className="login-art">
-        <svg viewBox="0 0 30 26" width="40" aria-hidden="true"><circle cx="8" cy="18" r="6.6" fill="#d17a3f" /><circle cx="22" cy="18" r="6.6" fill="#d17a3f" /><circle cx="15" cy="6.6" r="6.6" fill="#e3ece8" /></svg>
+        <svg viewBox="0 0 30 26" width="40" aria-hidden="true"><circle cx="8" cy="18.4" r="6.2" fill="#ecece8" /><circle cx="22" cy="18.4" r="6.2" fill="#ecece8" /><circle cx="15" cy="6.4" r="6.2" fill="#c4652c" /></svg>
         <div>
-          <h2 style={{ fontSize: '2rem', fontStretch: '118%', color: '#fff' }}>{site.brand} website &amp; CRM</h2>
+          <h2 style={{ fontSize: '2.6rem', fontWeight: 300, letterSpacing: '-0.03em', lineHeight: 1.05, color: '#fff' }}>{site.brand} website &amp; CRM</h2>
           <p style={{ marginTop: 12 }}>Every website inquiry lands here with its source, drawings and an owner. Product pages and articles are edited and published from the same place.</p>
         </div>
         <p style={{ fontSize: '0.85rem' }}>{site.legalName}</p>

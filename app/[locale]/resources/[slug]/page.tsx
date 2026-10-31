@@ -56,34 +56,34 @@ export default async function Page({ params, searchParams }: P) {
           <article className="prose"><Markdown source={L(a, 'body', locale)} /></article>
           <aside className="article-aside">
             {a.applications.length > 0 && (
-              <div className="pd-section">
-                <h2>{d.products.apps}</h2>
-                <div className="chip-list">{a.applications.map((s) => { const ap = getApplication(s); return ap && <Link key={s} href={`${base}/applications/${s}`}>{L(ap, 'name', locale)}</Link>; })}</div>
+              <div>
+                <h2 className="kicker" style={{ marginBottom: 14 }}>{d.products.apps}</h2>
+                <div className="chips">{a.applications.map((s) => { const ap = getApplication(s); return ap && <Link key={s} href={`${base}/applications/${s}`}>{L(ap, 'name', locale)}</Link>; })}</div>
               </div>
             )}
             <div className="custom-box">
               <h2>{d.products.askEngineer}</h2>
               <p>{d.eng.briefLead}</p>
-              <Link href={`${base}/contact?type=drawing`} className="btn btn-copper">{d.home.ctaDrawing}</Link>
+              <Link href={`${base}/contact?type=drawing`} className="btn btn-light">{d.home.ctaDrawing}</Link>
             </div>
           </aside>
         </div>
       </div>
       {prods.length > 0 && (
-        <section className="section section-tint">
+        <section className="section sweep">
           <div className="wrap">
-            <h2 className="h2" style={{ marginBottom: 32 }}>{d.res.products}</h2>
+            <header className="head"><h2 className="h2">{d.res.products}</h2></header>
             <MiniProducts products={prods} locale={locale} />
           </div>
         </section>
       )}
       <section className="section">
         <div className="wrap">
-          <header className="section-head split">
+          <header className="head">
             <h2 className="h2">{d.home.resourcesTitle}</h2>
-            <Link href={`${base}/resources`} className="text-link">{d.res.back}</Link>
+            <div className="head-aside"><Link href={`${base}/resources`} className="link">{d.res.back}</Link></div>
           </header>
-          <ul className="article-grid">
+          <ul className="articles">
             {more.map((m) => (
               <li key={m.slug}>
                 <Link href={`${base}/resources/${m.slug}`} className="article-card">

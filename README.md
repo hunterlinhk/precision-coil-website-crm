@@ -6,6 +6,8 @@ A bilingual (English / 简体中文) B2B website for a precision coil manufactur
 
 ![Home page](docs/screenshots/home.jpg)
 
+![Macro section](docs/screenshots/macro.jpg)
+
 ## What's inside
 
 ### Public website (`/en`, `/zh`)
@@ -54,26 +56,54 @@ A bilingual (English / 简体中文) B2B website for a precision coil manufactur
 
 <p>
   <img src="docs/screenshots/pipe.jpg" width="49%" alt="Pipeline board" />
-  <img src="docs/screenshots/analytics.jpg" width="49%" alt="Analytics" />
-</p>
-<p>
-  <img src="docs/screenshots/product.jpg" width="49%" alt="Product page" />
-  <img src="docs/screenshots/zh.jpg" width="49%" alt="Chinese home page" />
+  <img src="docs/screenshots/volume.jpg" width="49%" alt="Manufacturing section" />
 </p>
 
 ## Design notes
 
-- **Concept:** the orthocyclic winding cross-section, the image a coil engineer recognises instantly, is the one bold element. Everything around it stays quiet and precise, like a spec sheet.
-- **Palette:** magnet-wire enamel green (`#12332f`) and copper (`#b8612a`) on cool paper (`#f3f4f1`). Copper appears where the material appears.
-- **Type:** Archivo variable (self-hosted). The width axis carries the hierarchy: expanded for headlines and model numbers, normal width for reading. Chinese falls back to PingFang SC / Noto Sans SC.
-- **Product imagery** is generated from each part's real dimensions (line illustrations and dimensioned drawings), so the catalogue looks complete before any photography exists. Uploaded photos appear alongside.
-- The admin uses the same brand at a denser working scale. Charts are single-series and directly labelled.
+**Direction: "Magnified".** The company's story has two scales: wire six times finer than a hair, and hundreds of millions of parts a year. The site shows both. Studio-lit product shots and a macro view of the turns carry the precision; a production tray, the winding head and a cut-away cross-section carry the volume and the process.
+
+- **The product is the imagery.** Every product, and every manufacturing scene, is a physically based 3D render of the real part geometry (enamelled copper, litz wire, ferrite, brushed steel, polyimide), lit in a virtual softbox studio. Uploaded photography replaces a render automatically when a product has photos in the CMS.
+- **Monochrome interface, copper product.** Neutral studio paper (`#f2f2f0`), a darker sweep (`#e6e6e2`) for product stages, true black type, and a dark studio (`#0c0d0e`) for the macro and manufacturing sections. The only colour on the page comes from the products themselves.
+- **Type.** Barlow, a DIN-lineage grotesk: the same family of lettering used on engineering drawings and industrial signage. Hairline 200 weight for display (a nod to fine wire), DIN numerals for specifications. Chinese falls back to PingFang SC / Noto Sans SC.
+- **Rhythm.** Light and dark sections alternate. Each screen makes one statement. Measurement conventions (dimension lines, specimen captions, a to-scale hair/wire comparison, a development timeline drawn in weeks) are the graphic language.
+- **Interaction.** Product pages have Photo / 3D / Drawing views. The 3D view loads only when opened, and is drag-to-rotate and scroll-to-zoom. The catalogue switches between an image grid and a sortable table, with parametric filters.
+
+<p>
+  <img src="docs/screenshots/families.jpg" width="49%" alt="Product families" />
+  <img src="docs/screenshots/stack.jpg" width="49%" alt="Exploded Qi2 module" />
+</p>
+<p>
+  <img src="docs/screenshots/products.jpg" width="49%" alt="Catalogue" />
+  <img src="docs/screenshots/product.jpg" width="49%" alt="Product page" />
+</p>
+<p>
+  <img src="docs/screenshots/zh.jpg" width="49%" alt="Chinese home page" />
+  <img src="docs/screenshots/mobile.jpg" width="24%" alt="Mobile home page" />
+</p>
+
+### Product renders
+
+The images in `public/renders/` are generated from code, not photographed:
+
+```bash
+npm run render                       # all shots (needs Playwright's Chromium)
+node scripts/render/run.mjs aw-vcm-af0806 && node scripts/render/reframe.mjs   # one shot
+```
+
+- `lib/coil3d/models.ts`: procedural models for every product type, in millimetres, driven by each product's `dims`
+- `lib/coil3d/studio.ts`: softbox environment, key light, contact shadow and framing
+- `lib/coil3d/scenes.ts`: the product and manufacturing shots
+- `scripts/render/reframe.mjs`: crops every studio render to the same visual scale
+
+The same models drive the live 3D viewer on product pages, so a product added in the CMS with a known shape gets a 3D view immediately.
 
 ## Tech
 
 - Next.js 15 (App Router, Server Actions), React 19, TypeScript
+- Three.js for the product renders and the 3D viewer
 - SQLite via `better-sqlite3`: one file, no database server to run
-- No UI framework; hand-written CSS
+- No UI framework; hand-written CSS, self-hosted Barlow
 - Auth: scrypt password hashes and HTTP-only session cookies
 - Uploads are stored on disk. Customer drawings are private and only downloadable by signed-in CRM users.
 
@@ -134,7 +164,9 @@ app/
   api/inquiry          form capture → CRM
   api/media, api/files public media / private customer files
   sitemap.ts, robots.ts, llms.txt
-components/site        header, footer, winding hero, drawings, finder, inquiry form
+components/site        header, footer, product stage, 3D viewer, drawings, finder, inquiry form
+lib/coil3d             3D models, studio lighting and scenes for renders and the viewer
+scripts/render         headless render pipeline → public/renders/*.webp
 components/admin       shell, tables, charts, editors
 lib/                   db + schema, seed data, auth, i18n, SEO helpers, CRM rules
 ```

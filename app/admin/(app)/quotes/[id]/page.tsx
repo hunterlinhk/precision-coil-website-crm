@@ -29,7 +29,7 @@ export default async function Quote({ params, searchParams }: { params: Promise<
         <input type="hidden" name="id" value={q.id} />
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontSize: '1.4rem', fontWeight: 700, fontStretch: '120%' }}>{site.brand}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 500 }}>{site.brand}</div>
             <div className="muted">{site.legalName}<br />{site.address.en}<br />{owner?.email || site.email}</div>
           </div>
           <div style={{ textAlign: 'right' }}>

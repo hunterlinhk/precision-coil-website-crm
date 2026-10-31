@@ -14,7 +14,7 @@ export function Shell({ user, children }: { user: User; children: React.ReactNod
       <div className="mobile-bar"><strong>{site.brand} Admin</strong><MobileToggle /></div>
       <aside className="side">
         <Link href="/admin" className="side-brand">
-          <svg viewBox="0 0 30 26" aria-hidden="true"><circle cx="8" cy="18" r="6.6" fill="#d17a3f" /><circle cx="22" cy="18" r="6.6" fill="#d17a3f" /><circle cx="15" cy="6.6" r="6.6" fill="currentColor" /></svg>
+          <svg viewBox="0 0 30 26" aria-hidden="true"><circle cx="8" cy="18.4" r="6.2" fill="currentColor" /><circle cx="22" cy="18.4" r="6.2" fill="currentColor" /><circle cx="15" cy="6.4" r="6.2" fill="#c4652c" /></svg>
           <div><b>{site.brand}</b><span>Website &amp; CRM</span></div>
         </Link>
         <nav className="side-group" aria-label="Overview">

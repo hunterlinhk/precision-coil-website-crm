@@ -4,6 +4,7 @@ import { site, type Locale } from '@/lib/site';
 import { t } from '@/lib/i18n';
 import { alternates } from '@/lib/seo';
 import { Breadcrumbs } from '@/components/site/ArticleList';
+import { Render } from '@/components/site/Render';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -17,6 +18,7 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
   const zh = locale === 'zh';
   const base = `/${locale}`;
   const f = site.facts;
+  const home = d.home;
   const facts: [string, string][] = [
     [f.annualCoils, zh ? '年产线圈' : 'coils a year'],
     [f.vcmShare, zh ? '全球 VCM 线圈份额' : 'of global VCM coil shipments'],
@@ -38,17 +40,21 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
         <p className="lead">{d.mfg.lead}</p>
       </div>
 
-      <section className="section">
-        <div className="wrap">
-          <h2 className="h2" style={{ marginBottom: 28 }}>{d.mfg.facts}</h2>
-          <dl className="facts-grid">{facts.map(([v, l]) => <div key={l}><dt>{l}</dt><dd>{v}</dd></div>)}</dl>
-        </div>
-      </section>
-
-      <section className="section section-tint">
-        <div className="wrap">
-          <h2 className="h2" style={{ marginBottom: 28 }}>{d.mfg.plants}</h2>
-          <div className="plant-list">
+      <section className="dark">
+        <div className="volume-hero"><Render name="tray" alt={zh ? '装满自动对焦线圈的防静电托盘' : 'A production tray of autofocus coils'} sizes="100vw" priority /></div>
+        <div className="wrap" style={{ paddingBottom: 'var(--section)' }}>
+          <dl className="facts" style={{ marginTop: 0, gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>{facts.map(([v, l]) => <div key={l}><dt>{l}</dt><dd className="figure">{v}</dd></div>)}</dl>
+          <div className="process-pair" style={{ marginTop: 'clamp(64px, 8vw, 120px)' }}>
+            <figure>
+              <div className="chapter-media"><Render name="winding" alt={zh ? '绕线嘴将导线排绕到骨架上' : 'Winding nozzle laying wire onto a bobbin'} sizes="(max-width: 900px) 100vw, 50vw" /></div>
+              <figcaption><strong>{home.chapters[0][0]}</strong>{home.chapters[0][1]}</figcaption>
+            </figure>
+            <figure>
+              <div className="chapter-media"><Render name="section" alt={zh ? '正交排绕线圈截面' : 'Cross-section of an orthocyclic winding'} sizes="(max-width: 900px) 100vw, 50vw" /></div>
+              <figcaption><strong>{home.chapters[1][0]}</strong>{home.chapters[1][1]}</figcaption>
+            </figure>
+          </div>
+          <div className="plants" style={{ marginTop: 'clamp(64px, 8vw, 120px)' }}>
             {site.plants.map((p) => {
               const [name, role] = p[locale].split(' — ');
               return <div className="plant" key={name}><h3>{name}</h3><p>{role}</p></div>;
@@ -58,9 +64,9 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
       </section>
 
       <section className="section">
-        <div className="wrap two-col">
-          <h2 className="h2">{d.mfg.equipment}</h2>
-          <div className="table-scroll">
+        <div className="wrap split">
+          <h2 className="h2 split-l">{d.mfg.equipment}</h2>
+          <div className="table-scroll split-r">
             <table className="eq-table">
               <thead><tr><th>{zh ? '设备' : 'Equipment'}</th><th>{zh ? '数量' : 'Count'}</th><th>{zh ? '说明' : 'Notes'}</th></tr></thead>
               <tbody>{d.mfg.equipmentList.map(([a, b, c]) => <tr key={a}><td>{a}</td><td className="n">{b}</td><td>{c}</td></tr>)}</tbody>
@@ -69,25 +75,25 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
         </div>
       </section>
 
-      <section className="section section-rule">
-        <div className="wrap two-col">
-          <h2 className="h2">{d.mfg.quality}</h2>
-          <div>
+      <section className="section sweep">
+        <div className="wrap split">
+          <h2 className="h2 split-l">{d.mfg.quality}</h2>
+          <div className="split-r">
             <ul className="check-list">{d.mfg.qualityPoints.map((q) => <li key={q}>{q}</li>)}</ul>
-            <h3 className="h3" style={{ fontSize: '1.15rem', margin: '40px 0 12px' }}>{d.mfg.metrics}</h3>
-            <table className="spec-table"><tbody>{metrics.map(([k, v]) => <tr key={k}><th scope="row">{k}</th><td>{v}</td></tr>)}</tbody></table>
+            <h3 className="kicker" style={{ margin: '56px 0 14px' }}>{d.mfg.metrics}</h3>
+            <dl className="facts facts-light" style={{ marginTop: 0, gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>{metrics.map(([k, v]) => <div key={k}><dt>{k}</dt><dd className="figure" style={{ fontSize: 'clamp(1.8rem, 1.2rem + 1.4vw, 2.6rem)' }}>{v}</dd></div>)}</dl>
           </div>
         </div>
       </section>
 
-      <section className="section section-tint">
-        <div className="wrap audit-band">
-          <div>
+      <section className="section">
+        <div className="wrap proof">
+          <div className="proof-copy">
             <h2 className="h2">{d.mfg.certs}</h2>
             <p className="lead">{d.mfg.auditLead}</p>
-            <Link href={`${base}/contact?type=general&topic=audit`} className="btn btn-ink">{d.mfg.audit}</Link>
+            <Link href={`${base}/contact?type=general&topic=audit`} className="btn btn-solid">{d.mfg.audit}</Link>
           </div>
-          <ul className="cert-list">{site.certifications.map((c) => <li key={c.code}><strong>{c.code}</strong><span>{zh ? c.zh : c.en}</span></li>)}</ul>
+          <ul className="certs">{site.certifications.map((c) => <li key={c.code}><strong>{c.code}</strong><span>{zh ? c.zh : c.en}</span></li>)}</ul>
         </div>
       </section>
     </>

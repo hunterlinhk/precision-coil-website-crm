@@ -23,6 +23,8 @@ const weighted = <T,>(pairs: [T, number][]) => {
 const daysAgo = (d: number, h = 9 + Math.floor(r() * 9)) => {
   const t = new Date(Date.now() - d * 86400000);
   t.setUTCHours(h, Math.floor(r() * 60), 0, 0);
+  // Past dates must not land later than "now" on today's date.
+  if (d >= 0 && t.getTime() > Date.now()) t.setTime(Date.now() - (1 + Math.floor(r() * 5)) * 3600000);
   return t.toISOString().slice(0, 19).replace('T', ' ');
 };
 const daysAhead = (d: number) => daysAgo(-d, 10);
