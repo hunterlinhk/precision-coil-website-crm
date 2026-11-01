@@ -4,6 +4,9 @@ A bilingual (English / 简体中文) B2B website for a precision coil manufactur
 
 > **Arcwind is a placeholder brand.** The company name, figures, certifications, part numbers, customers and contacts are illustrative. Replace them in `lib/site.ts` and the seed files before using this for a real client.
 
+**Live preview (public website, static copy):** https://hunterlinhk.github.io/precision-coil-website-crm/
+**Full app with CRM/CMS, one click:** [Open in GitHub Codespaces](https://codespaces.new/hunterlinhk/precision-coil-website-crm) and sign in at `/HunterLin` (username `HunterLin`, password `arcwind-demo`).
+
 ![Home page](docs/screenshots/home.jpg)
 
 ![Macro section](docs/screenshots/macro.jpg)
@@ -25,7 +28,7 @@ A bilingual (English / 简体中文) B2B website for a precision coil manufactur
 
 **SEO / GEO (AI search) built in:** canonical + `hreflang` on every page, `sitemap.xml` with language alternates, `robots.txt`, JSON-LD (Organization, Product with spec properties, FAQPage, BreadcrumbList, TechArticle / NewsArticle), plain "key facts" blocks, and an [`llms.txt`](https://llmstxt.org) summary that AI assistants can read and cite.
 
-### Admin (`/admin`)
+### Admin (`/HunterLin`)
 
 ![CRM dashboard](docs/screenshots/dash.jpg)
 
@@ -68,6 +71,23 @@ A bilingual (English / 简体中文) B2B website for a precision coil manufactur
 - **Type.** Barlow, a DIN-lineage grotesk: the same family of lettering used on engineering drawings and industrial signage. Hairline 200 weight for display (a nod to fine wire), DIN numerals for specifications. Chinese falls back to PingFang SC / Noto Sans SC.
 - **Rhythm.** Light and dark sections alternate. Each screen makes one statement. Measurement conventions (dimension lines, specimen captions, a to-scale hair/wire comparison, a development timeline drawn in weeks) are the graphic language.
 - **Interaction.** Product pages have Photo / 3D / Drawing views. The 3D view loads only when opened, and is drag-to-rotate and scroll-to-zoom. The catalogue switches between an image grid and a sortable table, with parametric filters.
+- **Tones.** The renders are transparent, so every product family and industry sits on its own muted backdrop (clay, fog, sand, sage, graphite, lilac, steel, mint). The catalogue reads by colour at a glance; the products stay true to life.
+
+### Motion and interaction
+
+All motion is CSS and small, dependency-free client components (`components/site/motion.tsx`, `app/flair.css`), driven by `data-*` attributes so server components stay server components. Everything switches off under `prefers-reduced-motion`, and content is fully visible without JavaScript.
+
+| Where | What it does |
+|---|---|
+| Hero | Headline rises word by word, "One in ten" in moving copper; a **magnifying loupe** follows the cursor over the coil; a live counter of coils wound today (600M/yr ≈ 19 per second); a rotating seal |
+| Macro | Figure counts down from 1.000 to 0.012 mm, image zooms with scroll, a **measuring reticle** reads out X/Y in mm under the cursor, hair ring draws itself |
+| Manufacturing | A **vision-inspection scan** sweeps the production tray and each coil it passes reports PASS with its resistance; facts count up; a dot-matrix map with a shuttle between the two plants |
+| Timeline | Gantt bars grow in sequence on graph paper |
+| Exploded view | Callouts pop in one by one; hovering a layer highlights its callout |
+| Applications | Home: a floating preview follows the cursor down the list. Index: a **scroll story**, the sticky stage changes colour and product per industry |
+| Product pages | Loupe on the photo, dimensioned drawing draws itself, key figures count up; adding to the quote list sends a copper bead to the header counter |
+| Quote form | Five turns of wire fill in copper as the required answers are completed; confirmation bursts |
+| Everywhere | Scroll-progress copper line under the header, magnetic buttons, spotlight cards, marquee of families, wire that winds itself on scroll at the end of the page, footer wordmark lit by the cursor, local time at the Dongguan plant |
 
 <p>
   <img src="docs/screenshots/families.jpg" width="49%" alt="Product families" />
@@ -76,6 +96,10 @@ A bilingual (English / 简体中文) B2B website for a precision coil manufactur
 <p>
   <img src="docs/screenshots/products.jpg" width="49%" alt="Catalogue" />
   <img src="docs/screenshots/product.jpg" width="49%" alt="Product page" />
+</p>
+<p>
+  <img src="docs/screenshots/applications.jpg" width="49%" alt="Applications scroll story" />
+  <img src="docs/screenshots/resources.jpg" width="49%" alt="Resources with covers" />
 </p>
 <p>
   <img src="docs/screenshots/zh.jpg" width="49%" alt="Chinese home page" />
@@ -111,16 +135,18 @@ The same models drive the live 3D viewer on product pages, so a product added in
 
 ```bash
 npm install
-npm run dev            # http://localhost:3000  →  /en, /zh, /admin
+npm run dev            # http://localhost:3000  →  /en, /zh, /HunterLin
 ```
 
 The database (`data/arcwind.db`) is created and filled with demo content on first start. To start over: `npm run seed` (deletes the database; it is re-seeded on next start).
 
+The admin lives at **`/HunterLin`** (any capitalisation redirects there). Sign in with a username or a work email.
+
 **Demo accounts** (password `arcwind-demo`, or whatever you set in `ADMIN_PASSWORD` before first start):
 
-| Email | Role |
+| Sign in as | Role |
 |---|---|
-| admin@arcwind.example | Administrator |
+| `HunterLin` (or admin@arcwind.example) | Administrator |
 | daniel.wu@arcwind.example | Sales manager |
 | kevin.zhang@arcwind.example | Sales rep (CN, TW, HK, KR, JP) |
 | laura.martin@arcwind.example | Sales rep (Americas & Europe) |
@@ -146,6 +172,16 @@ SITE_URL=https://www.example.com npm start -- -p 3000
 
 Put it behind nginx or Caddy with HTTPS (session cookies are `Secure` in production), and keep it running with a process manager such as pm2 or systemd. **Back up the `data/` directory**: it holds the database and all uploads. Change every demo password from *Team & permissions* after the first sign-in.
 
+## Static preview (GitHub Pages)
+
+The public website can also be exported as a static, read-only copy:
+
+```bash
+NEXT_PUBLIC_BASE_PATH=/precision-coil-website-crm SITE_URL=https://hunterlinhk.github.io/precision-coil-website-crm npm run preview:static
+```
+
+This builds with the base path, crawls every page in both languages into `preview-out/`, and puts the quote form in preview mode (it shows the confirmation without sending anything). That folder is what the `gh-pages` branch serves. The CRM/CMS needs the Node server and database, so it is not part of the static copy; use Codespaces or your own server for that.
+
 ## Making it a real client's site
 
 1. `lib/site.ts`: name, contacts, address, plants, headline figures, certifications.
@@ -158,9 +194,9 @@ Put it behind nginx or Caddy with HTTPS (session cookies are `Secure` in product
 ```
 app/
   [locale]/            public site (en, zh)
-  admin/(auth)/login   sign-in
-  admin/(app)/…        CRM + CMS screens
-  admin/actions.ts     all server actions (permission-checked)
+  HunterLin/(auth)/login   sign-in (username or email)
+  HunterLin/(app)/…        CRM + CMS screens
+  HunterLin/actions.ts     all server actions (permission-checked)
   api/inquiry          form capture → CRM
   api/media, api/files public media / private customer files
   sitemap.ts, robots.ts, llms.txt

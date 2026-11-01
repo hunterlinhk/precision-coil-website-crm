@@ -7,7 +7,7 @@ export const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL,
+  id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, username TEXT,
   password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'sales',
   regions TEXT DEFAULT '', active INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -101,11 +101,19 @@ function open() {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   db.exec(SCHEMA);
+  // Older databases: add the sign-in username column.
+  const cols = db.prepare('PRAGMA table_info(users)').all() as { name: string }[];
+  if (!cols.some((c) => c.name === 'username')) db.exec('ALTER TABLE users ADD COLUMN username TEXT');
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS users_username ON users(username COLLATE NOCASE)');
   const count = db.prepare('SELECT COUNT(*) c FROM users').get() as { c: number };
   if (count.c === 0) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { seed } = require('./seed');
     seed(db);
+  }
+  // The primary administrator signs in as HunterLin.
+  if (!db.prepare('SELECT 1 FROM users WHERE username IS NOT NULL LIMIT 1').get()) {
+    db.prepare("UPDATE users SET username = 'HunterLin' WHERE id = (SELECT MIN(id) FROM users WHERE role = 'admin')").run();
   }
   return db;
 }

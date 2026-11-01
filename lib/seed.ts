@@ -34,7 +34,7 @@ export function seed(db: Database.Database) {
   const tx = db.transaction(() => {
     // ---------- Users ----------
     const users = [
-      ['Mei Chen', 'admin@arcwind.example', 'admin', ''],
+      ['Hunter Lin', 'admin@arcwind.example', 'admin', ''],
       ['Daniel Wu', 'daniel.wu@arcwind.example', 'manager', ''],
       ['Kevin Zhang', 'kevin.zhang@arcwind.example', 'sales', 'CN,TW,HK,KR,JP'],
       ['Laura Martín', 'laura.martin@arcwind.example', 'sales', 'US,CA,MX,DE,FR,IT,ES,GB,NL,DK,SE,CH,PL'],
@@ -43,6 +43,7 @@ export function seed(db: Database.Database) {
     ];
     const insUser = db.prepare('INSERT INTO users (name,email,password_hash,role,regions) VALUES (?,?,?,?,?)');
     users.forEach((u) => insUser.run(u[0], u[1], pw, u[2], u[3]));
+    db.prepare("UPDATE users SET username = 'HunterLin' WHERE email = 'admin@arcwind.example'").run();
     const repFor = (country: string) => (['CN', 'TW', 'HK', 'KR', 'JP'].includes(country) ? 3 : ['VN', 'TH', 'MY', 'SG', 'IN', 'ID', 'PH', 'AU'].includes(country) ? 5 : 4);
 
     // ---------- Catalogue ----------

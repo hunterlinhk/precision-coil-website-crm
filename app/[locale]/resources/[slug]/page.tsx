@@ -10,6 +10,7 @@ import { Markdown } from '@/lib/markdown';
 import { alternates, JsonLd, articleJsonLd } from '@/lib/seo';
 import { Breadcrumbs, fmtDate } from '@/components/site/ArticleList';
 import { MiniProducts } from '@/components/site/MiniProducts';
+import { SplitTitle } from '@/components/site/Flair';
 
 type P = { params: Promise<{ locale: Locale; slug: string }>; searchParams: Promise<{ preview?: string }> };
 
@@ -44,7 +45,7 @@ export default async function Page({ params, searchParams }: P) {
       <div className="wrap">
         <header className="article-head">
           <Breadcrumbs items={[[d.common.home, base], [d.res.title, `${base}/resources`], [d.res[a.type], `${base}/resources?type=${a.type}`]]} />
-          <h1 className="h1">{L(a, 'title', locale)}</h1>
+          <SplitTitle text={L(a, 'title', locale)} className="h1" />
           <p className="lead">{L(a, 'excerpt', locale)}</p>
           <div className="article-meta">
             <time dateTime={a.published_at || a.updated_at}>{fmtDate(a.published_at || a.updated_at, locale)}</time>
@@ -72,7 +73,7 @@ export default async function Page({ params, searchParams }: P) {
       {prods.length > 0 && (
         <section className="section sweep">
           <div className="wrap">
-            <header className="head"><h2 className="h2">{d.res.products}</h2></header>
+            <header className="head"><h2 className="h2" data-reveal>{d.res.products}</h2></header>
             <MiniProducts products={prods} locale={locale} />
           </div>
         </section>
@@ -80,7 +81,7 @@ export default async function Page({ params, searchParams }: P) {
       <section className="section">
         <div className="wrap">
           <header className="head">
-            <h2 className="h2">{d.home.resourcesTitle}</h2>
+            <h2 className="h2" data-reveal>{d.home.resourcesTitle}</h2>
             <div className="head-aside"><Link href={`${base}/resources`} className="link">{d.res.back}</Link></div>
           </header>
           <ul className="articles">

@@ -2,6 +2,8 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { flyToQuote } from './motion';
+import { withBase } from '@/lib/base';
 
 // ---------- Quote list (RFQ basket), stored per browser ----------
 export type RfqItem = { model: string; slug: string; category: string; name_en: string; name_zh: string; qty: string };
@@ -48,7 +50,7 @@ export function AddToRfq({ item, labels, size, variant }: { item: Omit<RfqItem, 
   if (variant === 'icon') {
     return (
       <button type="button" className="icon-btn" aria-pressed={inList} disabled={!ready} title={inList ? labels.added : labels.add}
-        aria-label={`${inList ? labels.added : labels.add}: ${item.model}`} onClick={() => (inList ? remove(item.model) : add({ ...item, qty: '' }))}>
+        aria-label={`${inList ? labels.added : labels.add}: ${item.model}`} onClick={(e) => { if (inList) remove(item.model); else { flyToQuote(e.currentTarget); add({ ...item, qty: '' }); } }}>
         {inList
           ? <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="1.6" /></svg>
           : <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v11M2.5 8h11" fill="none" stroke="currentColor" strokeWidth="1.4" /></svg>}
@@ -61,7 +63,7 @@ export function AddToRfq({ item, labels, size, variant }: { item: Omit<RfqItem, 
       className={`btn ${inList ? 'btn-done' : 'btn-solid'} ${size === 'sm' ? 'btn-sm' : ''}`}
       aria-pressed={inList}
       disabled={!ready}
-      onClick={() => (inList ? remove(item.model) : add({ ...item, qty: '' }))}
+      onClick={(e) => { if (inList) remove(item.model); else { flyToQuote(e.currentTarget); add({ ...item, qty: '' }); } }}
     >
       {inList ? (
         <><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="1.8" /></svg>{labels.added}</>
@@ -78,7 +80,7 @@ export function LangSwitch({ locale, label, name }: { locale: string; label: str
   const other = locale === 'en' ? 'zh' : 'en';
   const href = path.replace(/^\/(en|zh)(?=\/|$)/, `/${other}`);
   return (
-    <a href={href} className="lang" hrefLang={other === 'zh' ? 'zh-CN' : 'en'} aria-label={label}
+    <a href={withBase(href) + (process.env.NEXT_PUBLIC_STATIC_PREVIEW === '1' && !href.endsWith('/') ? '/' : '')} className="lang" hrefLang={other === 'zh' ? 'zh-CN' : 'en'} aria-label={label}
       onClick={() => { document.cookie = `aw_locale=${other}; path=/; max-age=31536000; samesite=lax`; }}>
       {name}
     </a>

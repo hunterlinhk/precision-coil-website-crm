@@ -4,6 +4,7 @@ import { t } from '@/lib/i18n';
 import { alternates } from '@/lib/seo';
 import { Breadcrumbs } from '@/components/site/ArticleList';
 import { InquiryForm } from '@/components/site/InquiryForm';
+import { SplitTitle } from '@/components/site/Flair';
 
 type P = { params: Promise<{ locale: Locale }>; searchParams: Promise<{ type?: string; model?: string; topic?: string }> };
 
@@ -23,7 +24,7 @@ export default async function Page({ params, searchParams }: P) {
     <>
       <div className="wrap page-head">
         <Breadcrumbs items={[[d.common.home, `/${locale}`], [d.nav.contact]]} />
-        <h1 className="h1">{d.contact.title}</h1>
+        <SplitTitle text={d.contact.title} className="h1" />
         <p className="lead">{d.contact.lead}</p>
       </div>
       <div className="wrap contact-layout">

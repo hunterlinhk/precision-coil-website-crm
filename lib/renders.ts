@@ -1,4 +1,5 @@
 import manifest from '@/public/renders/manifest.json';
+import { withBase } from './base';
 
 type Entry = { w: number; h: number; xl?: boolean };
 const M = manifest as Record<string, Entry>;
@@ -9,9 +10,9 @@ export const hasRender = (name: string) => !!M[name];
 export function renderSrc(name: string) {
   const e = M[name];
   if (!e) return null;
-  const set = [`/renders/${name}-sm.webp ${Math.round(e.w / 2)}w`, `/renders/${name}.webp ${e.w}w`];
-  if (e.xl) set.push(`/renders/${name}-xl.webp ${e.w * (e.w >= 1600 ? 1.5 : 1)}w`);
-  return { src: `/renders/${name}.webp`, srcSet: set.join(', '), width: e.w, height: e.h };
+  const set = [`${withBase('/renders/')}${name}-sm.webp ${Math.round(e.w / 2)}w`, `${withBase('/renders/')}${name}.webp ${e.w}w`];
+  if (e.xl) set.push(`${withBase('/renders/')}${name}-xl.webp ${e.w * (e.w >= 1600 ? 1.5 : 1)}w`);
+  return { src: `${withBase('/renders/')}${name}.webp`, srcSet: set.join(', '), width: e.w, height: e.h };
 }
 
 // Category → hero render.

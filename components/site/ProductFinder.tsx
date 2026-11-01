@@ -1,4 +1,5 @@
 'use client';
+import { toneOf } from '@/lib/tones';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { AddToRfq } from './client';
@@ -94,7 +95,7 @@ export function ProductFinder({ rows, labels, locale, pills, pillsLabel }: { row
         <ul className="pgrid">
           {filtered.map((r) => (
             <li key={r.slug} className="pcard">
-              <div className="pcard-media">{r.thumb}</div>
+              <div className="pcard-media" data-spot data-tone={toneOf(r.category)}>{r.thumb}</div>
               <div className="pcard-body">
                 <Link className="pcard-model" href={`/${locale}/products/${r.category}/${r.slug}`}>{r.model}</Link>
                 <span className="pcard-name">{r.name}</span>
@@ -126,7 +127,7 @@ export function ProductFinder({ rows, labels, locale, pills, pillsLabel }: { row
                 <tr key={r.slug}>
                   <td>
                     <div className="p-cell">
-                      <div className="p-thumb">{r.thumb}</div>
+                      <div className="p-thumb" data-tone={toneOf(r.category)}>{r.thumb}</div>
                       <div><Link className="p-model" href={`/${locale}/products/${r.category}/${r.slug}`}>{r.model}</Link><span className="p-name">{r.name}</span></div>
                     </div>
                   </td>

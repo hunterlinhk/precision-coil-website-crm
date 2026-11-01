@@ -15,7 +15,7 @@ export function Gantt({ locale }: { locale: Locale }) {
         <span />
         <div className="ticks">{[0, 2, 4, 6, 8, 10, 12, 14].map((w) => <span key={w} style={{ left: `${(w / total) * 100}%` }}>{zh ? `${w} 周` : w === 0 ? `${h.week} 0` : w}</span>)}</div>
       </div>
-      <ol>
+      <ol data-stagger>
         {h.path.map(([name, desc, start, len, range]) => (
           <li className="gantt-row" key={name}>
             <div className="gantt-label"><h3>{name}</h3><p>{desc}</p></div>

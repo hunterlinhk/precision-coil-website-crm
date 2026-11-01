@@ -5,6 +5,7 @@ import { t } from '@/lib/i18n';
 import { alternates } from '@/lib/seo';
 import { Breadcrumbs } from '@/components/site/ArticleList';
 import { Render } from '@/components/site/Render';
+import { SplitTitle, ScanOverlay, PlantsMap, CertMark, Arrow } from '@/components/site/Flair';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -36,15 +37,15 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
     <>
       <div className="wrap page-head">
         <Breadcrumbs items={[[d.common.home, base], [d.nav.manufacturing]]} />
-        <h1 className="h1">{d.mfg.title}</h1>
-        <p className="lead">{d.mfg.lead}</p>
+        <SplitTitle text={d.mfg.title} className="h1" />
+        <p className="lead" data-reveal>{d.mfg.lead}</p>
       </div>
 
       <section className="dark">
-        <div className="volume-hero"><Render name="tray" alt={zh ? '装满自动对焦线圈的防静电托盘' : 'A production tray of autofocus coils'} sizes="100vw" priority /></div>
+        <div className="volume-hero" data-reveal><Render name="tray" alt={zh ? '装满自动对焦线圈的防静电托盘' : 'A production tray of autofocus coils'} sizes="100vw" priority /><ScanOverlay zh={zh} /></div>
         <div className="wrap" style={{ paddingBottom: 'var(--section)' }}>
-          <dl className="facts" style={{ marginTop: 0, gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>{facts.map(([v, l]) => <div key={l}><dt>{l}</dt><dd className="figure">{v}</dd></div>)}</dl>
-          <div className="process-pair" style={{ marginTop: 'clamp(64px, 8vw, 120px)' }}>
+          <dl className="facts" data-stagger style={{ marginTop: 0, gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>{facts.map(([v, l]) => <div key={l}><dt>{l}</dt><dd className="figure" data-count data-from={/^\d{4}$/.test(v) ? '1980' : undefined}>{v}</dd></div>)}</dl>
+          <div className="process-pair" data-stagger style={{ marginTop: 'clamp(64px, 8vw, 120px)' }}>
             <figure>
               <div className="chapter-media"><Render name="winding" alt={zh ? '绕线嘴将导线排绕到骨架上' : 'Winding nozzle laying wire onto a bobbin'} sizes="(max-width: 900px) 100vw, 50vw" /></div>
               <figcaption><strong>{home.chapters[0][0]}</strong>{home.chapters[0][1]}</figcaption>
@@ -54,7 +55,8 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
               <figcaption><strong>{home.chapters[1][0]}</strong>{home.chapters[1][1]}</figcaption>
             </figure>
           </div>
-          <div className="plants" style={{ marginTop: 'clamp(64px, 8vw, 120px)' }}>
+          <div style={{ marginTop: 'clamp(64px, 8vw, 120px)' }}><PlantsMap a={zh ? '东莞' : 'Dongguan'} b={zh ? '北宁' : 'Bắc Ninh'} km={zh ? '约 860 公里 · 同一套工艺规范' : '≈ 860 km · one process specification'} /></div>
+          <div className="plants" data-stagger style={{ marginTop: 32 }}>
             {site.plants.map((p) => {
               const [name, role] = p[locale].split(' — ');
               return <div className="plant" key={name}><h3>{name}</h3><p>{role}</p></div>;
@@ -65,11 +67,11 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 
       <section className="section">
         <div className="wrap split">
-          <h2 className="h2 split-l">{d.mfg.equipment}</h2>
+          <h2 className="h2 split-l" data-reveal>{d.mfg.equipment}</h2>
           <div className="table-scroll split-r">
             <table className="eq-table">
               <thead><tr><th>{zh ? '设备' : 'Equipment'}</th><th>{zh ? '数量' : 'Count'}</th><th>{zh ? '说明' : 'Notes'}</th></tr></thead>
-              <tbody>{d.mfg.equipmentList.map(([a, b, c]) => <tr key={a}><td>{a}</td><td className="n">{b}</td><td>{c}</td></tr>)}</tbody>
+              <tbody data-stagger>{d.mfg.equipmentList.map(([a, b, c]) => <tr key={a}><td>{a}</td><td className="n" data-count>{b}</td><td>{c}</td></tr>)}</tbody>
             </table>
           </div>
         </div>
@@ -77,11 +79,11 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 
       <section className="section sweep">
         <div className="wrap split">
-          <h2 className="h2 split-l">{d.mfg.quality}</h2>
+          <h2 className="h2 split-l" data-reveal>{d.mfg.quality}</h2>
           <div className="split-r">
-            <ul className="check-list">{d.mfg.qualityPoints.map((q) => <li key={q}>{q}</li>)}</ul>
+            <ul className="check-list" data-stagger>{d.mfg.qualityPoints.map((q) => <li key={q}>{q}</li>)}</ul>
             <h3 className="kicker" style={{ margin: '56px 0 14px' }}>{d.mfg.metrics}</h3>
-            <dl className="facts facts-light" style={{ marginTop: 0, gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>{metrics.map(([k, v]) => <div key={k}><dt>{k}</dt><dd className="figure" style={{ fontSize: 'clamp(1.8rem, 1.2rem + 1.4vw, 2.6rem)' }}>{v}</dd></div>)}</dl>
+            <dl className="facts facts-light" data-stagger style={{ marginTop: 0, gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>{metrics.map(([k, v]) => <div key={k}><dt>{k}</dt><dd className="figure" data-count style={{ fontSize: 'clamp(1.8rem, 1.2rem + 1.4vw, 2.6rem)' }}>{v}</dd></div>)}</dl>
           </div>
         </div>
       </section>
@@ -89,11 +91,11 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
       <section className="section">
         <div className="wrap proof">
           <div className="proof-copy">
-            <h2 className="h2">{d.mfg.certs}</h2>
+            <h2 className="h2" data-reveal>{d.mfg.certs}</h2>
             <p className="lead">{d.mfg.auditLead}</p>
-            <Link href={`${base}/contact?type=general&topic=audit`} className="btn btn-solid">{d.mfg.audit}</Link>
+            <Link href={`${base}/contact?type=general&topic=audit`} className="btn btn-solid btn-arrow" data-magnetic>{d.mfg.audit}<Arrow /></Link>
           </div>
-          <ul className="certs">{site.certifications.map((c) => <li key={c.code}><strong>{c.code}</strong><span>{zh ? c.zh : c.en}</span></li>)}</ul>
+          <ul className="certs" data-stagger>{site.certifications.map((c) => <li key={c.code}><CertMark /><strong>{c.code}</strong><span>{zh ? c.zh : c.en}</span></li>)}</ul>
         </div>
       </section>
     </>

@@ -8,3 +8,6 @@ data/uploads
 *.tsbuildinfo
 next-env.d.ts
 .render-cache
+.next-preview/
+preview-out/
+.preview-data/

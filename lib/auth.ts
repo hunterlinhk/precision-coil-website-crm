@@ -8,7 +8,7 @@ import { verifyPassword } from './password';
 export const SESSION_COOKIE = 'aw_session';
 
 export type Role = 'admin' | 'manager' | 'sales' | 'editor';
-export type User = { id: number; name: string; email: string; role: Role; regions: string };
+export type User = { id: number; name: string; email: string; username?: string | null; role: Role; regions: string };
 
 // What each role may do. Sales reps only see records they own (or unassigned inquiries).
 export const can = {
@@ -23,8 +23,10 @@ export const roleLabel: Record<Role, string> = {
   admin: 'Administrator', manager: 'Sales manager', sales: 'Sales rep', editor: 'Content editor',
 };
 
-export async function login(email: string, password: string) {
-  const row = db().prepare('SELECT * FROM users WHERE email = ? AND active = 1').get(email.trim().toLowerCase()) as any;
+// Sign in with either the username (case-insensitive) or the work email.
+export async function login(identifier: string, password: string) {
+  const id = identifier.trim().toLowerCase();
+  const row = db().prepare('SELECT * FROM users WHERE (lower(email) = ? OR lower(username) = ?) AND active = 1').get(id, id) as any;
   if (!row || !verifyPassword(password, row.password_hash)) return false;
   const token = crypto.randomBytes(32).toString('hex');
   const expires = new Date(Date.now() + 14 * 86400000);
@@ -43,14 +45,14 @@ export async function logout() {
 export async function currentUser(): Promise<User | null> {
   const t = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!t) return null;
-  const row = db().prepare(`SELECT u.id,u.name,u.email,u.role,u.regions FROM sessions s JOIN users u ON u.id = s.user_id
+  const row = db().prepare(`SELECT u.id,u.name,u.email,u.username,u.role,u.regions FROM sessions s JOIN users u ON u.id = s.user_id
     WHERE s.token = ? AND s.expires_at > ? AND u.active = 1`).get(t, new Date().toISOString()) as User | undefined;
   return row || null;
 }
 
 export async function requireUser(check?: (u: User) => boolean): Promise<User> {
   const u = await currentUser();
-  if (!u) redirect('/admin/login');
-  if (check && !check(u)) redirect('/admin?denied=1');
+  if (!u) redirect('/HunterLin/login');
+  if (check && !check(u)) redirect('/HunterLin?denied=1');
   return u;
 }

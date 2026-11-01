@@ -14,8 +14,8 @@ export const QUOTE_STATUS = ['draft', 'sent', 'accepted', 'rejected'];
 export const scope = (u: User, col = 'owner_id', allowUnassigned = false) =>
   can.seeAll(u) ? '1=1' : `(${col} = ${Number(u.id)}${allowUnassigned ? ` OR ${col} IS NULL` : ''})`;
 
-export function users(): { id: number; name: string; role: string; regions: string; active: number; email: string }[] {
-  return db().prepare('SELECT id, name, role, regions, active, email FROM users ORDER BY active DESC, name').all() as any;
+export function users(): { id: number; name: string; role: string; regions: string; active: number; email: string; username: string | null }[] {
+  return db().prepare('SELECT id, name, role, regions, active, email, username FROM users ORDER BY active DESC, name').all() as any;
 }
 export const salesUsers = () => users().filter((u) => u.active && u.role !== 'editor');
 

@@ -1,3 +1,5 @@
+import { toneOf } from '@/lib/tones';
+import { SplitTitle } from './Flair';
 import type { Locale } from '@/lib/site';
 import { t, L } from '@/lib/i18n';
 import { getCategories, getProducts, type Category } from '@/lib/content';
@@ -33,14 +35,14 @@ export function ProductsView({ locale, category }: { locale: Locale; category?: 
         {category ? (
           <div className="cat-hero">
             <div className="cat-hero-copy">
-              <h1 className="h1">{L(category, 'name', locale)}</h1>
+              <SplitTitle text={L(category, 'name', locale)} className="h1" />
               <p className="lead">{L(category, 'summary', locale)}</p>
             </div>
-            <div className="cat-hero-art"><Render name={familyRender[category.slug] || 'aw-vcm-af0806'} alt={L(category, 'name', locale)} sizes="(max-width: 900px) 100vw, 50vw" priority /></div>
+            <div className="cat-hero-art" data-tone={toneOf(category.slug)} data-reveal><Render name={familyRender[category.slug] || 'aw-vcm-af0806'} alt={L(category, 'name', locale)} sizes="(max-width: 900px) 100vw, 50vw" priority /></div>
           </div>
         ) : (
           <>
-            <h1 className="h1">{d.products.title}</h1>
+            <SplitTitle text={d.products.title} className="h1" />
             <p className="lead">{d.products.lead}</p>
           </>
         )}

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { site } from '@/lib/site';
 import { can, roleLabel, type User } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { logoutAction } from '@/app/admin/actions';
+import { logoutAction } from '@/app/HunterLin/actions';
 import { SideLink, MobileToggle } from './client';
 
 export function Shell({ user, children }: { user: User; children: React.ReactNode }) {
@@ -13,37 +13,37 @@ export function Shell({ user, children }: { user: User; children: React.ReactNod
     <div className="shell" id="shell">
       <div className="mobile-bar"><strong>{site.brand} Admin</strong><MobileToggle /></div>
       <aside className="side">
-        <Link href="/admin" className="side-brand">
+        <Link href="/HunterLin" className="side-brand">
           <svg viewBox="0 0 30 26" aria-hidden="true"><circle cx="8" cy="18.4" r="6.2" fill="currentColor" /><circle cx="22" cy="18.4" r="6.2" fill="currentColor" /><circle cx="15" cy="6.4" r="6.2" fill="#c4652c" /></svg>
           <div><b>{site.brand}</b><span>Website &amp; CRM</span></div>
         </Link>
         <nav className="side-group" aria-label="Overview">
-          <SideLink href="/admin" exact>Dashboard</SideLink>
-          <SideLink href="/admin/tasks" badge={overdue || undefined}>My follow-ups</SideLink>
+          <SideLink href="/HunterLin" exact>Dashboard</SideLink>
+          <SideLink href="/HunterLin/tasks" badge={overdue || undefined}>My follow-ups</SideLink>
         </nav>
         {can.crm(user) && (
           <nav className="side-group" aria-label="Sales">
             <h2>Sales</h2>
-            <SideLink href="/admin/inquiries" badge={newInq || undefined}>Inquiries</SideLink>
-            <SideLink href="/admin/accounts">Customers</SideLink>
-            <SideLink href="/admin/pipeline">Pipeline</SideLink>
-            <SideLink href="/admin/quotes">Quotes</SideLink>
-            <SideLink href="/admin/samples">Samples</SideLink>
-            <SideLink href="/admin/analytics">Analytics</SideLink>
+            <SideLink href="/HunterLin/inquiries" badge={newInq || undefined}>Inquiries</SideLink>
+            <SideLink href="/HunterLin/accounts">Customers</SideLink>
+            <SideLink href="/HunterLin/pipeline">Pipeline</SideLink>
+            <SideLink href="/HunterLin/quotes">Quotes</SideLink>
+            <SideLink href="/HunterLin/samples">Samples</SideLink>
+            <SideLink href="/HunterLin/analytics">Analytics</SideLink>
           </nav>
         )}
         {can.cms(user) && (
           <nav className="side-group" aria-label="Website">
             <h2>Website</h2>
-            <SideLink href="/admin/products">Products</SideLink>
-            <SideLink href="/admin/articles">News &amp; articles</SideLink>
+            <SideLink href="/HunterLin/products">Products</SideLink>
+            <SideLink href="/HunterLin/articles">News &amp; articles</SideLink>
             <a href="/en" target="_blank" rel="noreferrer">View site ↗</a>
           </nav>
         )}
         {can.users(user) && (
           <nav className="side-group" aria-label="Settings">
             <h2>Settings</h2>
-            <SideLink href="/admin/users">Team &amp; permissions</SideLink>
+            <SideLink href="/HunterLin/users">Team &amp; permissions</SideLink>
           </nav>
         )}
         <div className="side-foot">

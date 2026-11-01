@@ -10,6 +10,7 @@ import { alternates } from '@/lib/seo';
 import { ArticleList, Breadcrumbs } from '@/components/site/ArticleList';
 import { MiniProducts } from '@/components/site/MiniProducts';
 import { Render } from '@/components/site/Render';
+import { SplitTitle } from '@/components/site/Flair';
 
 type P = { params: Promise<{ locale: Locale; slug: string }> };
 
@@ -34,7 +35,7 @@ export default async function Page({ params }: P) {
         <Breadcrumbs items={[[d.common.home, base], [d.apps.title, `${base}/applications`], [L(a, 'name', locale)]]} />
         <div className="cat-hero">
           <div className="cat-hero-copy">
-            <h1 className="h1">{L(a, 'name', locale)}</h1>
+            <SplitTitle text={L(a, 'name', locale)} className="h1" />
             <p className="lead">{L(a, 'lead', locale)}</p>
           </div>
           {prods[0] && <div className="cat-hero-art"><Render name={productRenderName(prods[0])} alt={`${prods[0].model}`} sizes="(max-width: 900px) 100vw, 50vw" priority /></div>}
@@ -61,7 +62,7 @@ export default async function Page({ params }: P) {
       {prods.length > 0 && (
         <section className="section">
           <div className="wrap">
-            <header className="head"><h2 className="h2">{d.apps.parts}</h2></header>
+            <header className="head"><h2 className="h2" data-reveal>{d.apps.parts}</h2></header>
             <MiniProducts products={prods} locale={locale} />
           </div>
         </section>
@@ -69,7 +70,7 @@ export default async function Page({ params }: P) {
       {arts.length > 0 && (
         <section className="section sweep">
           <div className="wrap">
-            <header className="head"><h2 className="h2">{d.apps.reading}</h2></header>
+            <header className="head"><h2 className="h2" data-reveal>{d.apps.reading}</h2></header>
             <ArticleList articles={arts} locale={locale} />
           </div>
         </section>

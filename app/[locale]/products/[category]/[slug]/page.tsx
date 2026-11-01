@@ -7,7 +7,9 @@ import { getProduct, getCategory, getProducts, articlesForProduct, type Product 
 import { getApplication } from '@/lib/applications';
 import { currentUser, can } from '@/lib/auth';
 import { Markdown } from '@/lib/markdown';
-import { productRenderName } from '@/lib/renders';
+import { productRenderName, renderSrc } from '@/lib/renders';
+import { Loupe } from '@/components/site/motion';
+import { toneOf } from '@/lib/tones';
 import { alternates, JsonLd, productJsonLd, faqJsonLd, breadcrumbJsonLd } from '@/lib/seo';
 import { DimensionDrawing } from '@/components/site/DimensionDrawing';
 import { Render } from '@/components/site/Render';
@@ -84,6 +86,8 @@ export default async function ProductPage({ params, searchParams }: P) {
   const photo = p.images[0]
     ? <img src={`/api/media/${p.images[0].id}`} alt={`${p.model} ${p.images[0].name}`} />
     : <Render name={productRenderName(p)} alt={`${p.model} ${L(p, 'name', locale)}`} sizes="(max-width: 980px) 100vw, 58vw" priority />;
+  const rs = renderSrc(productRenderName(p));
+  const lensSrc = p.images[0] ? `/api/media/${p.images[0].id}` : rs ? (rs.srcSet.includes('-xl') ? rs.src.replace('.webp', '-xl.webp') : rs.src) : '';
 
   return (
     <>
@@ -91,8 +95,8 @@ export default async function ProductPage({ params, searchParams }: P) {
       <div className="wrap" style={{ paddingTop: 'clamp(24px, 3vw, 40px)' }}>
         <Breadcrumbs items={[[d.common.home, base], [d.nav.products, `${base}/products`], [L(c, 'name', locale), `${base}/products/${category}`], [p.model]]} />
         <div className="pd">
-          <div className="pd-stage">
-            <Stage photo={photo} drawing={<DimensionDrawing dims={p.dims} model={p.model} />} dims={p.dims} slug={p.slug}
+          <div className="pd-stage" data-tone={toneOf(category)}>
+            <Stage photo={<Loupe src={lensSrc} zoom={2.4} label={zh ? '悬停放大' : 'Hover to magnify'}>{photo}</Loupe>} drawing={<div className="draw-wrap" data-draw><DimensionDrawing dims={p.dims} model={p.model} /></div>} dims={p.dims} slug={p.slug}
               labels={zh
                 ? { photo: '图片', model: '3D', drawing: '尺寸图', hint: '拖动旋转，滚轮缩放', viewer: `${p.model} 三维模型` }
                 : { photo: 'Photo', model: '3D', drawing: 'Drawing', hint: 'Drag to rotate, scroll to zoom', viewer: `${p.model} 3D model` }} />
@@ -100,12 +104,12 @@ export default async function ProductPage({ params, searchParams }: P) {
           <div className="pd-info">
             <Link href={`${base}/products/${category}`} className="pd-family">{L(c, 'name', locale)}</Link>
             <h1>
-              <span className="pd-model">{p.model}</span>
+              <span className="pd-model">{p.model.split('-').map((part, i, a) => <span key={i} className="pd-model-part" style={{ ['--i' as any]: i }}>{part}{i < a.length - 1 ? '-' : ''}</span>)}</span>
               <span className="pd-name">{L(p, 'name', locale)}</span>
             </h1>
             <p className="pd-summary">{L(p, 'summary', locale)}</p>
-            <dl className="keyfigs">
-              {figs.map((f) => <div key={f.label}><dt>{f.label}</dt><dd className={f.value.length > 9 ? 'long' : undefined}>{f.value}{f.unit && <small>{f.unit}</small>}</dd></div>)}
+            <dl className="keyfigs" data-stagger>
+              {figs.map((f) => <div key={f.label}><dt>{f.label}</dt><dd className={f.value.length > 9 ? 'long' : undefined} data-count>{f.value}{f.unit && <small>{f.unit}</small>}</dd></div>)}
             </dl>
             <div className="pd-actions">
               <AddToRfq item={rfqItem} labels={{ add: d.products.addRfq, added: d.products.inRfq }} />
@@ -123,9 +127,9 @@ export default async function ProductPage({ params, searchParams }: P) {
 
       <div className="wrap">
         <section className="spec-block" aria-labelledby="specs">
-          <h2 id="specs" className="h2">{d.products.specs}</h2>
+          <h2 id="specs" className="h2" data-reveal>{d.products.specs}</h2>
           <div className="spec-body">
-            <table className="spec-table">
+            <table className="spec-table" data-reveal>
               <tbody>{p.specs.map((s) => <tr key={s.k}><th scope="row">{zh ? s.zh : s.en}</th><td>{s.v}{s.u && <small>{s.u}</small>}</td></tr>)}</tbody>
             </table>
             <p className="spec-note">{d.products.unitsNote}</p>
@@ -133,7 +137,7 @@ export default async function ProductPage({ params, searchParams }: P) {
         </section>
 
         <section className="spec-block" aria-labelledby="about">
-          <h2 id="about" className="h2">{zh ? '说明' : 'About this part'}</h2>
+          <h2 id="about" className="h2" data-reveal>{zh ? '说明' : 'About this part'}</h2>
           <div className="spec-body aside-stack">
             <div className="prose"><Markdown source={L(p, 'body', locale)} /></div>
             <div className="custom-box" id="custom">
@@ -160,7 +164,7 @@ export default async function ProductPage({ params, searchParams }: P) {
         </section>
 
         <section className="spec-block" aria-labelledby="faq">
-          <h2 id="faq" className="h2">{d.products.faq}</h2>
+          <h2 id="faq" className="h2" data-reveal>{d.products.faq}</h2>
           <dl className="faq spec-body">{faq.map(([q, a]) => <div key={q}><dt>{q}</dt><dd>{a}</dd></div>)}</dl>
         </section>
       </div>

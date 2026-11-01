@@ -4,6 +4,7 @@ import { t } from '@/lib/i18n';
 import { getCategories } from '@/lib/content';
 import { applications } from '@/lib/applications';
 import { RfqCount, LangSwitch, NavToggle, NavLink, HeaderScroll } from './client';
+import { LocalClock } from './motion';
 
 export function BrandMark({ className }: { className?: string }) {
   // Three turns in orthocyclic packing; the copper one is the turn being laid.
@@ -42,6 +43,7 @@ export function Header({ locale }: { locale: Locale }) {
         </div>
       </div>
       <HeaderScroll />
+      <span className="scroll-line" aria-hidden="true" />
     </header>
   );
 }
@@ -78,6 +80,10 @@ export function Footer({ locale }: { locale: Locale }) {
             </ul>
           </div>
         </div>
+      </div>
+      <div className="wrap footer-mega-wrap">
+        <p className="footer-live"><LocalClock label={zh ? '东莞' : 'Dongguan'} running={zh ? '180 条产线运行中' : '180 lines running'} /></p>
+        <div className="footer-mega" data-spot aria-hidden="true">{site.brand}</div>
       </div>
       <div className="wrap footer-base">
         <span>© {new Date().getFullYear()} {(zh ? site.legalNameZh : site.legalName).replace(/\.$/, '')}{zh ? '。' : '. '}{d.footer.rights}</span>
