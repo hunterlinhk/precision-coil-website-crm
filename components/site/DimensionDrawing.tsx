@@ -91,6 +91,23 @@ export function DimensionDrawing({ dims, model }: { dims: any; model: string }) 
       els.push(<line key="h1" className="hidden" x1={SX - rw / 2} y1={SY - hh / 2} x2={SX - rw / 2} y2={SY + hh / 2} />, <line key="h2" className="hidden" x1={SX + rw / 2} y1={SY - hh / 2} x2={SX + rw / 2} y2={SY + hh / 2} />);
     }
     els.push(<VDim key="sh" y1={SY - hh / 2} y2={SY + hh / 2} x={SX + sw / 2 + 30} from={SX + sw / 2 + 4} label={f(H)} />);
+  } else if (s === 'octagon') {
+    // Lens carrier: plan view octagon with threaded bore, side view with the winding band.
+    const S = dims.S, D = dims.D, H = dims.H, C = dims.C || H * 0.4;
+    const k = 200 / S, h = (S * k) / 2, c = S * 0.21 * k;
+    const pts = [[h - c, -h], [h, -h + c], [h, h - c], [h - c, h], [-h + c, h], [-h, h - c], [-h, -h + c], [-h + c, -h]].map(([x, y]) => `${PX + x},${PY + y}`).join(' ');
+    const r = (D * k) / 2;
+    els.push(<polygon key="o" className="part" points={pts} />, <circle key="i" className="part" cx={PX} cy={PY} r={r} />, <circle key="t" className="hidden" cx={PX} cy={PY} r={r + 4} />);
+    els.push(<Center key="c1" x1={PX - h - 14} y1={PY} x2={PX + h + 14} y2={PY} />, <Center key="c2" x1={PX} y1={PY - h - 14} x2={PX} y2={PY + h + 14} />);
+    els.push(<HDim key="d1" x1={PX - h} x2={PX + h} y={PY - h - 30} from={PY - h - 4} label={f(S)} />);
+    els.push(<HDim key="d2" x1={PX - r} x2={PX + r} y={PY + h + 30} from={PY} label={`Ø${f(D)}`} />);
+    const sk = Math.min(150 / S, 150 / H);
+    const sw = S * sk, sh = H * sk, ch = C * sk, fb = H * 0.17 * sk;
+    els.push(<rect key="s" className="part" x={SX - sw / 2} y={SY - sh / 2} width={sw} height={sh} rx="1.5" />);
+    els.push(<rect key="cb" className="part fillcu" x={SX - sw / 2 - 3} y={SY + sh / 2 - fb - ch} width={sw + 6} height={ch} />);
+    els.push(<line key="b1" className="hidden" x1={SX - r * (sk / k)} y1={SY - sh / 2} x2={SX - r * (sk / k)} y2={SY + sh / 2} />, <line key="b2" className="hidden" x1={SX + r * (sk / k)} y1={SY - sh / 2} x2={SX + r * (sk / k)} y2={SY + sh / 2} />);
+    els.push(<VDim key="sh" y1={SY - sh / 2} y2={SY + sh / 2} x={SX + sw / 2 + 30} from={SX + sw / 2 + 6} label={f(H)} />);
+    els.push(<VDim key="sc" y1={SY + sh / 2 - fb - ch} y2={SY + sh / 2 - fb} x={SX - sw / 2 - 30} from={SX - sw / 2 - 6} label={f(C)} />);
   } else if (s === 'bobbin') {
     const D = dims.D, L = dims.L, d = dims.d;
     const k = Math.min(220 / D, 220 / L);

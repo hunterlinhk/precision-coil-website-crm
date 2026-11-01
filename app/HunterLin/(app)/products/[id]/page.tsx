@@ -6,6 +6,8 @@ import { applications } from '@/lib/applications';
 import { Topbar, Panel, Pill } from '@/components/admin/ui';
 import { SpecEditor, SeoFields, BodyField } from '@/components/admin/cms';
 import { ConfirmButton } from '@/components/admin/client';
+import { PhotoManager } from '@/components/admin/PhotoManager';
+import { productRenderName, renderSrc } from '@/lib/renders';
 import { saveProduct, deleteProduct, publishProduct, unpublishProduct } from '@/app/HunterLin/actions';
 
 const ERR: Record<string, string> = { model: 'A model number is required.', slug: 'Another product already uses that URL. Change the URL slug.' };
@@ -15,7 +17,7 @@ export default async function ProductEdit({ params, searchParams }: { params: Pr
   const { id } = await params;
   const sp = await searchParams;
   const isNew = id === 'new';
-  const p = isNew ? null : (db().prepare('SELECT p.*, c.slug AS cat_slug FROM products p JOIN categories c ON c.id = p.category_id WHERE p.id = ?').get(+id) as any);
+  const p = isNew ? null : (db().prepare('SELECT p.*, c.slug AS cat_slug, c.shape AS cat_shape FROM products p JOIN categories c ON c.id = p.category_id WHERE p.id = ?').get(+id) as any);
   if (!isNew && !p) notFound();
   const cats = db().prepare('SELECT * FROM categories ORDER BY sort').all() as any[];
   const params_ = j<Record<string, number>>(p?.params, {});
@@ -61,18 +63,17 @@ export default async function ProductEdit({ params, searchParams }: { params: Pr
               </div>
               {pair('custom', 'Customization options', { area: true, rows: 2 })}
             </Panel>
-            <Panel title="Images and documents">
+            <Panel title="Photos">
+              <PhotoManager key={images.map((i) => i.id).join(',') || 'none'} images={images} model={p?.model || 'New product'} fallback={p ? renderSrc(productRenderName({ slug: p.slug, dims: j(p.dims, {}), shape: p.cat_shape }))?.src : undefined} />
+            </Panel>
+            <Panel title="Documents">
               <div className="form">
-                {(images.length > 0 || files.length > 0) && (
+                {files.length > 0 && (
                   <div className="file-chips">
-                    {images.map((f) => <label className="file-chip" key={f.id}><img src={`/api/media/${f.id}`} alt="" />{f.name}<input type="checkbox" name="remove_file" value={f.id} aria-label={`Remove ${f.name}`} /> remove</label>)}
                     {files.map((f) => <label className="file-chip" key={f.id}><a href={`/api/media/${f.id}`}>{f.name}</a><input type="checkbox" name="remove_file" value={f.id} aria-label={`Remove ${f.name}`} /> remove</label>)}
                   </div>
                 )}
-                <div className="fgrid">
-                  <div className="f"><label htmlFor="new_images">Add product photos</label><input id="new_images" name="new_images" type="file" accept="image/*" multiple /><div className="hint"><span>Shown as tabs next to the generated drawing.</span></div></div>
-                  <div className="f"><label htmlFor="new_files">Add datasheets (PDF)</label><input id="new_files" name="new_files" type="file" accept=".pdf,.step,.stp,.zip" multiple /><div className="hint"><span>Listed under Documents on the product page.</span></div></div>
-                </div>
+                <div className="f"><label htmlFor="new_files">Add datasheets (PDF)</label><input id="new_files" name="new_files" type="file" accept=".pdf,.step,.stp,.zip" multiple /><div className="hint"><span>Listed under Documents on the product page.</span></div></div>
               </div>
             </Panel>
             <Panel title="Search and AI visibility">

@@ -18,14 +18,14 @@ export function renderSrc(name: string) {
 // Category → hero render.
 export const familyRender: Record<string, string> = {
   'vcm-coils': 'family-vcm',
-  'air-core-coils': 'aw-ac-rf0350',
+  'air-core-coils': 'family-aircore',
   'bobbin-coils': 'aw-bb-sn0812',
-  'wireless-charging-coils': 'aw-wc-mpp50',
+  'wireless-charging-coils': 'aw-wc-rx43',
   'linear-motors': 'aw-lm-z0825',
   'wireless-chargers': 'aw-ch-q2m15',
 };
 export const shapeFallback: Record<string, string> = {
-  racetrack: 'aw-vcm-af0806', ring: 'aw-ac-vc1200', bobbin: 'aw-bb-sn0812', spiral: 'aw-wc-wr20', lra: 'aw-lm-x0835', coin: 'aw-lm-z0825', module: 'aw-ch-q2m15',
+  racetrack: 'aw-vcm-af0806', octagon: 'aw-vcm-cw0940', ring: 'aw-ac-vc1200', bobbin: 'aw-bb-sn0812', spiral: 'aw-wc-wr20', lra: 'aw-lm-x0835', coin: 'aw-lm-z0825', module: 'aw-ch-q2m15',
 };
 export function productRenderName(p: { slug: string; dims?: any; shape?: string }) {
   if (hasRender(p.slug)) return p.slug;

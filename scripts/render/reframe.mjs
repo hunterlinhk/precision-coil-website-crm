@@ -9,7 +9,7 @@ const dir = path.join(process.cwd(), 'public', 'renders');
 const manifestPath = path.join(dir, 'manifest.json');
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 // name → [aspect w/h, fill of the limiting dimension]
-const special = { 'hero-af': [1.25, 0.86], exploded: [0.86, 0.9], 'family-vcm': [4 / 3, 0.84] };
+const special = { 'hero-af': [1.25, 0.86], 'hero-carrier': [1.25, 0.8], exploded: [0.86, 0.9], 'family-vcm': [4 / 3, 0.84], 'family-aircore': [4 / 3, 0.86] };
 const skip = new Set(['macro-turns', 'tray', 'winding', 'section', 'spool']);
 
 for (const name of Object.keys(manifest)) {

@@ -9,6 +9,7 @@ import { currentUser, can } from '@/lib/auth';
 import { Markdown } from '@/lib/markdown';
 import { productRenderName, renderSrc } from '@/lib/renders';
 import { Loupe } from '@/components/site/motion';
+import { PhotoSwitch } from '@/components/site/PhotoSwitch';
 import { toneOf } from '@/lib/tones';
 import { alternates, JsonLd, productJsonLd, faqJsonLd, breadcrumbJsonLd } from '@/lib/seo';
 import { DimensionDrawing } from '@/components/site/DimensionDrawing';
@@ -96,7 +97,9 @@ export default async function ProductPage({ params, searchParams }: P) {
         <Breadcrumbs items={[[d.common.home, base], [d.nav.products, `${base}/products`], [L(c, 'name', locale), `${base}/products/${category}`], [p.model]]} />
         <div className="pd">
           <div className="pd-stage" data-tone={toneOf(category)}>
-            <Stage photo={<Loupe src={lensSrc} zoom={2.4} label={zh ? '悬停放大' : 'Hover to magnify'}>{photo}</Loupe>} drawing={<div className="draw-wrap" data-draw><DimensionDrawing dims={p.dims} model={p.model} /></div>} dims={p.dims} slug={p.slug}
+            <Stage photo={p.images.length > 1
+              ? <PhotoSwitch images={p.images.map((im) => ({ src: `/api/media/${im.id}`, alt: `${p.model} ${im.name}` }))} label={zh ? '悬停放大' : 'Hover to magnify'} />
+              : <Loupe src={lensSrc} zoom={2.4} label={zh ? '悬停放大' : 'Hover to magnify'}>{photo}</Loupe>} drawing={<div className="draw-wrap" data-draw><DimensionDrawing dims={p.dims} model={p.model} /></div>} dims={p.dims} slug={p.slug}
               labels={zh
                 ? { photo: '图片', model: '3D', drawing: '尺寸图', hint: '拖动旋转，滚轮缩放', viewer: `${p.model} 三维模型` }
                 : { photo: 'Photo', model: '3D', drawing: 'Drawing', hint: 'Drag to rotate, scroll to zoom', viewer: `${p.model} 3D model` }} />

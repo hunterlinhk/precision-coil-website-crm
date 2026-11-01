@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { type Mats, productModel, racetrackCoil, racetrackCoilGeometry, bobbinCoil, qi2Module, ringStack, path, tint, rng } from './models';
+import { type Mats, productModel, racetrackCoil, racetrackCoilGeometry, bobbinCoil, qi2Module, ringStack, path, tint, rng, afCarrier, oisCarrier, voiceCoil, rfInductor, telecoil } from './models';
 import type { Mode, View } from './studio';
 
 export type Shot = { build: (m: Mats, q: number) => THREE.Object3D; view: View; mode: Mode; size: [number, number]; ss?: number };
@@ -10,6 +10,12 @@ export type Shot = { build: (m: Mats, q: number) => THREE.Object3D; view: View; 
 const AF = { L: 8, W: 6, iL: 5.2, iW: 3.2, H: 0.9 };
 
 export function productView(shape: string, slug: string): View {
+  if (slug.includes('-cw')) return { az: 28, el: 34, fill: 0.78 };
+  if (slug.includes('-cx')) return { az: 34, el: 20, fill: 0.74 };
+  if (slug.includes('-dt') || slug.includes('-tt')) return { az: 14, el: 56, fill: 0.86 };
+  if (slug.includes('-rx')) return { az: 8, el: 62, fill: 0.84 };
+  if (slug.includes('-dc0')) return { az: 30, el: 20, fill: 0.62 };
+  if (slug.includes('-sq')) return { az: 30, el: 36, fill: 0.8 };
   if (slug.includes('rf')) return { az: 30, el: 18, fill: 0.7 };
   if (slug.includes('st3')) return { az: 28, el: 32, fill: 0.86 };
   switch (shape) {
@@ -144,12 +150,27 @@ function spool(m: Mats) {
   return g;
 }
 
+// The camera family as it ships: a carrier-wound AF coil, an AF + OIS carrier and a periscope coil.
 function vcmFamily(m: Mats, q: number) {
   const g = new THREE.Group();
-  const af = racetrackCoil(AF, m, q); af.position.set(-7, 0, 2);
-  const ois = racetrackCoil({ L: 12, W: 10, iL: 7.6, iW: 5.2, H: 0.55, turns: 13 }, m, q); ois.position.set(6, 0, -3); ois.rotation.y = 0.5;
-  const per = racetrackCoil({ L: 16, W: 4, iL: 13.4, iW: 1.4, H: 1.2, turns: 8 }, m, q); per.position.set(-2, 0, 10); per.rotation.y = -0.25;
+  const af = afCarrier({ S: 9.4, D: 6.6, H: 2.2, C: 1.0 }, m, q); af.position.set(-8.5, 0, 3); af.rotation.y = 0.3;
+  const ois = oisCarrier({ S: 11, D: 7.6, H: 4.2 }, m, q); ois.position.set(6, 0, -2); ois.rotation.y = -0.45;
+  const per = racetrackCoil({ L: 16, W: 4, iL: 13.4, iW: 1.4, H: 1.2, turns: 8 }, m, q); per.position.set(-1, 0, 11); per.rotation.y = -0.15;
   g.add(af, ois, per);
+  return g;
+}
+
+// The air-core range side by side: square, round, rectangular, racetrack, tall and voice coils.
+function airFamily(m: Mats, q: number) {
+  const g = new THREE.Group();
+  const add = (o: THREE.Object3D, x: number, z: number, ry = 0) => { o.position.set(x, 0, z); o.rotation.y = ry; g.add(o); };
+  add(racetrackCoil({ L: 4.2, W: 4.2, iL: 2.2, iW: 2.2, H: 1.2, turns: 9, corner: 0.5 }, m, q), -9, -3, 0.4);
+  add(racetrackCoil({ L: 9, W: 5, iL: 6.4, iW: 2.6, H: 0.9, turns: 9 }, m, q), -1.5, -4.5, -0.2);
+  add(voiceCoil({ OD: 7.6, ID: 7.0, H: 2.6 }, m, q), 8, -3.5);
+  add(racetrackCoil({ L: 3, W: 3, iL: 1.5, iW: 1.5, H: 1, turns: 8, corner: 0.35 }, m, q), -10, 4.5, -0.3);
+  add(rfInductor({ OD: 2.6, H: 3.6 }, m), -3.5, 4.5, 0.5);
+  add(racetrackCoil({ L: 6.4, W: 6.4, iL: 4, iW: 4, H: 0.7, turns: 8 }, m, q), 3.5, 4.5);
+  add(telecoil({ L: 5, W: 2.4, iL: 3.2, iW: 0.8, H: 1.2 }, m, q), 10.5, 5, -0.5);
   return g;
 }
 
@@ -161,7 +182,9 @@ export const shots: Record<string, Shot> = {
   section: { build: (m) => section(m), view: { az: 24, el: 14, fov: 20, fill: 1.7, target: [0, 5, -3], ground: false }, mode: 'dark', size: [1800, 1350], ss: 1.5 },
   spool: { build: (m) => spool(m), view: { az: 24, el: 26, fill: 0.9 }, mode: 'dark', size: [1600, 1300] },
   exploded: { build: (m, q) => qi2Module({ L: 56, W: 56, H: 6.5 }, m, q, 1), view: { az: 34, el: 22, fov: 22, fill: 0.84 }, mode: 'light', size: [1800, 2000], ss: 1.5 },
-  'family-vcm': { build: vcmFamily, view: { az: 20, el: 46, fill: 1.3 }, mode: 'light', size: [1600, 1200] },
+  'family-vcm': { build: vcmFamily, view: { az: 22, el: 34, fill: 1.3 }, mode: 'light', size: [1600, 1200], ss: 2 },
+  'family-aircore': { build: airFamily, view: { az: 16, el: 44, fill: 1.25 }, mode: 'light', size: [1600, 1200], ss: 2 },
+  'hero-carrier': { build: (m, q) => afCarrier({ S: 9.4, D: 6.6, H: 2.2, C: 1.0 }, m, q * 1.4), view: { az: 24, el: 32, fill: 0.86 }, mode: 'light', size: [2000, 1700], ss: 1.6 },
 };
 
 export { ringStack };

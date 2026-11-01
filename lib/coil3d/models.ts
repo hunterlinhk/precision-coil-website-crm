@@ -51,7 +51,12 @@ export function materials() {
   const plasticBlack = new THREE.MeshPhysicalMaterial({ color: 0x17181a, metalness: 0, roughness: 0.42, clearcoat: 0.35, clearcoatRoughness: 0.4 });
   const plasticLcp = new THREE.MeshPhysicalMaterial({ color: 0xe8e2d2, metalness: 0, roughness: 0.48, sheen: 0.2 });
   const ferrite = new THREE.MeshPhysicalMaterial({ color: 0x2b2d2f, metalness: 0.15, roughness: 0.78 });
-  const nanocrystal = new THREE.MeshPhysicalMaterial({ color: 0x34373b, metalness: 0.7, roughness: 0.34 });
+  const nanocrystal = new THREE.MeshPhysicalMaterial({ color: 0xbdbcb5, metalness: 0.75, roughness: 0.5, normalMap: brushedNormal(), normalScale: new THREE.Vector2(0.25, 0.25) });
+  const nanoCore = new THREE.MeshPhysicalMaterial({ color: 0x2c2e31, metalness: 0.35, roughness: 0.55 });
+  // Litz bundles as they really look: many fine strands, paler and pinker than solid enamelled wire.
+  const litzPale = new THREE.MeshPhysicalMaterial({ color: new THREE.Color().setRGB(0.96, 0.5, 0.33, THREE.LinearSRGBColorSpace), metalness: 0.85, roughness: 0.42, clearcoat: 0.5, clearcoatRoughness: 0.25, normalMap: litzNormal(), normalScale: new THREE.Vector2(1.1, 1.1), vertexColors: true });
+  const kapton = new THREE.MeshPhysicalMaterial({ color: 0xe0a02a, metalness: 0, roughness: 0.25, clearcoat: 0.9, transmission: 0.35, thickness: 0.05 });
+  const carrierBlack = new THREE.MeshPhysicalMaterial({ color: 0x1c1d20, metalness: 0, roughness: 0.55, clearcoat: 0.15, clearcoatRoughness: 0.6 });
   const nickel = new THREE.MeshPhysicalMaterial({ color: 0xd2d6da, metalness: 1, roughness: 0.3 });
   const steel = new THREE.MeshPhysicalMaterial({ color: 0xc9ccce, metalness: 1, roughness: 0.32, normalMap: brushedNormal(), normalScale: new THREE.Vector2(0.4, 0.4) });
   const polyimide = new THREE.MeshPhysicalMaterial({ color: 0xbf6a14, metalness: 0, roughness: 0.3, clearcoat: 0.8, transmission: 0.25, thickness: 0.1 });
@@ -67,7 +72,7 @@ export function materials() {
   const trayBlack = new THREE.MeshPhysicalMaterial({ color: 0x1a1b1d, roughness: 0.62, metalness: 0 });
   const litz = new THREE.MeshPhysicalMaterial({ color: copperTone, metalness: 1, roughness: 0.34, clearcoat: 0.8, clearcoatRoughness: 0.15, normalMap: litzNormal(), normalScale: new THREE.Vector2(0.9, 0.9), vertexColors: true });
   const spoolCopper = new THREE.MeshPhysicalMaterial({ color: copperTone, metalness: 1, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.06, normalMap: grooveNormal(), normalScale: new THREE.Vector2(1.2, 1.2) });
-  return { copper, copperPolished, enamel, tin, silver, plasticBlack, plasticLcp, ferrite, nanocrystal, nickel, steel, polyimide, gold, pcb, ceramic, icBlack, wireRed, wireBlack, anodized, fabric, aluWhite, trayBlack, litz, spoolCopper };
+  return { copper, copperPolished, enamel, tin, silver, plasticBlack, plasticLcp, ferrite, nanocrystal, nanoCore, litzPale, kapton, carrierBlack, nickel, steel, polyimide, gold, pcb, ceramic, icBlack, wireRed, wireBlack, anodized, fabric, aluWhite, trayBlack, litz, spoolCopper };
 }
 export type Mats = ReturnType<typeof materials>;
 
@@ -231,7 +236,7 @@ export function rfInductor(o: { OD: number; H: number }, mats: Mats) {
   const turns = 6, wireR = o.OD * 0.07;
   const R = o.OD / 2 - wireR;
   const pitch = (o.H - wireR * 2) / turns;
-  const helix = new THREE.Mesh(tube(new HelixCurve(R, pitch, turns), wireR, 360, 12), mats.silver);
+  const helix = new THREE.Mesh(tint(tube(new HelixCurve(R, pitch, turns), wireR, 360, 12), 1), mats.copper);
   helix.position.y = o.OD * 0.9;
   helix.rotation.z = Math.PI / 2;
   helix.position.x = (turns * pitch) / 2;
@@ -240,8 +245,12 @@ export function rfInductor(o: { OD: number; H: number }, mats: Mats) {
   // straight leads bent down
   const y = o.OD * 0.9;
   const xL = -(turns * pitch) / 2, xR = (turns * pitch) / 2;
-  g.add(new THREE.Mesh(path([[xL, y - R, 0], [xL - R * 0.6, y - R * 0.8, 0], [xL - R * 0.8, y - R * 1.6, 0], [xL - R * 0.8, 0.05, 0]], wireR, 40, 12), mats.silver));
-  g.add(new THREE.Mesh(path([[xR, y + R, 0], [xR + R * 0.6, y + R * 0.4, 0], [xR + R * 0.8, y - R * 1.6, 0], [xR + R * 0.8, 0.05, 0]], wireR, 40, 12), mats.silver));
+  g.add(new THREE.Mesh(tint(path([[xL, y - R, 0], [xL - R * 0.6, y - R * 0.8, 0], [xL - R * 0.8, y - R * 1.6, 0], [xL - R * 0.8, R * 1.2, 0]], wireR, 40, 12), 1), mats.copper));
+  g.add(new THREE.Mesh(tint(path([[xR, y + R, 0], [xR + R * 0.6, y + R * 0.4, 0], [xR + R * 0.8, y - R * 1.6, 0], [xR + R * 0.8, R * 1.2, 0]], wireR, 40, 12), 1), mats.copper));
+  for (const x of [xL - R * 0.8, xR + R * 0.8]) { // tinned, stripped ends
+    const t = new THREE.Mesh(new THREE.CylinderGeometry(wireR, wireR, R * 1.2, 16), mats.tin);
+    t.position.set(x, R * 0.6, 0); g.add(t);
+  }
   g.children.forEach((c) => { c.castShadow = true; });
   return g;
 }
@@ -502,18 +511,283 @@ export function station(o: { L: number; W: number; H: number }, mats: Mats, q = 
   return g;
 }
 
+// ---------------------------------------------------------------- lens carriers (VCM)
+// Octagon, across-flats S, corners cut by c, centred in XY (used as an extrusion profile).
+function octPoints(S: number, c: number): [number, number][] {
+  const h = S / 2;
+  return [[h - c, h], [-h + c, h], [-h, h - c], [-h, -h + c], [-h + c, -h], [h - c, -h], [h, -h + c], [h, h - c]];
+}
+function octShape(S: number, c: number, holeR = 0) {
+  const pts = octPoints(S, c);
+  const sh = new THREE.Shape(pts.map(([x, y]) => new THREE.Vector2(x, y)));
+  if (holeR) { const hole = new THREE.Path(); hole.absarc(0, 0, holeR, 0, Math.PI * 2, true); sh.holes.push(hole); }
+  return sh;
+}
+// Closed, slightly rounded octagon in the XZ plane at height y: the path a turn takes around the carrier.
+function octCurve(S: number, c: number, y: number, round = 0.35) {
+  const pts = octPoints(S, c);
+  const out: THREE.Vector3[] = [];
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[(i + pts.length - 1) % pts.length], b = pts[i], n = pts[(i + 1) % pts.length];
+    for (const k of [round, 0.5 * round, 0]) {
+      const p = k ? [b[0] + (a[0] - b[0]) * k * 0.4, b[1] + (a[1] - b[1]) * k * 0.4] : b;
+      if (k) out.push(new THREE.Vector3(p[0], y, p[1]));
+    }
+    out.push(new THREE.Vector3(b[0] + (n[0] - b[0]) * round * 0.2, y, b[1] + (n[1] - b[1]) * round * 0.2));
+    out.push(new THREE.Vector3(b[0] + (n[0] - b[0]) * 0.5, y, b[1] + (n[1] - b[1]) * 0.5));
+  }
+  return new THREE.CatmullRomCurve3(out, true, 'centripetal', 0.5);
+}
+function extrudeY(shape: THREE.Shape, depth: number, y0: number, bevel = 0.05) {
+  const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 2, curveSegments: 48 });
+  g.rotateX(-Math.PI / 2); // extrusion along +Y
+  g.translate(0, y0, 0);
+  return g;
+}
+// Threaded bore: a ring of fine ridges on the inside wall.
+function threadedBore(r: number, h: number, y0: number, mats: Mats) {
+  const prof: THREE.Vector2[] = [];
+  const n = Math.max(4, Math.round(h / 0.22));
+  for (let i = 0; i <= n; i++) {
+    const y = y0 + (i / n) * h;
+    prof.push(new THREE.Vector2(r + (i % 2 ? 0 : 0.07), y));
+  }
+  const g = new THREE.LatheGeometry(prof, 96);
+  const m = new THREE.Mesh(g, mats.carrierBlack);
+  (m.material as THREE.Material).side = THREE.DoubleSide;
+  return m;
+}
+
+// Autofocus coil wound straight onto the lens carrier: an octagonal band of fine wire between two plastic flanges.
+export function afCarrier(o: { S: number; D: number; H: number; C: number }, mats: Mats, q = 1) {
+  const g = new THREE.Group();
+  const S = o.S, c = S * 0.21, R = o.D / 2;
+  const fb = o.H * 0.17, yb = fb, yt = fb + o.C; // bottom flange, coil band, top block
+  const coilT = 0.3;
+  const mk = (geo: THREE.BufferGeometry) => { const m = new THREE.Mesh(geo, mats.carrierBlack); m.castShadow = true; m.receiveShadow = true; g.add(m); return m; };
+  mk(extrudeY(octShape(S - 0.1, c, R), fb - 0.06, 0.03, 0.03));
+  mk(extrudeY(octShape(S - 2 * coilT, c * 0.9, R), o.C + 0.02, yb, 0));
+  mk(extrudeY(octShape(S, c, R), o.H - yt - 0.06, yt + 0.03, 0.04));
+  g.add(threadedBore(R, o.H, 0, mats));
+  // winding: visible outer turns over a solid copper band
+  const d = o.C / 15;
+  const rand = rng(31);
+  const turns: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < 15; i++) {
+    const y = yb + d * (i + 0.5);
+    const tg = tube(octCurve(S - 2 * coilT + 2 * (coilT - d * 0.5) + 0.12, c * 0.92, y), d * 0.48, Math.round(260 * q), Math.max(5, Math.round(6 * q)), true);
+    turns.push(tint(tg, 0.82 + rand() * 0.24));
+  }
+  const band = new THREE.Mesh(merge(turns), mats.copper);
+  band.castShadow = true;
+  g.add(band);
+  // four locating tabs on the top, at alternate corners
+  const corners = octPoints(S, c);
+  for (let k = 0; k < 4; k++) {
+    const [ax, az] = corners[k * 2], [bx, bz] = corners[k * 2 + 1];
+    const mx = (ax + bx) / 2, mz = (az + bz) / 2, ang = Math.atan2(mz, mx);
+    const tab = new THREE.Mesh(new RoundedBoxGeometry(0.9, 0.34, 0.7, 2, 0.08), mats.carrierBlack);
+    tab.position.set(Math.cos(ang) * (S / 2 - 0.1), o.H + 0.12, -Math.sin(ang) * (S / 2 - 0.1));
+    tab.rotation.y = ang;
+    tab.castShadow = true;
+    g.add(tab);
+    const post = new THREE.Mesh(new RoundedBoxGeometry(0.42, 0.3, 0.42, 2, 0.06), mats.carrierBlack);
+    post.position.set(Math.cos(ang + 0.45) * (S / 2 - 1.1), o.H + 0.12, -Math.sin(ang + 0.45) * (S / 2 - 1.1));
+    g.add(post);
+  }
+  // wire ends wrapped on two terminal posts under one corner
+  for (const k of [-1, 1]) {
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.5, 16), mats.tin);
+    pin.position.set(S / 2 - c * 0.35, yb - 0.12, k * 0.6);
+    g.add(pin);
+    g.add(new THREE.Mesh(tint(path([[S / 2 - coilT * 0.2, yb + 0.1, k * 0.3], [S / 2 - c * 0.2, yb - 0.02, k * 0.55], [S / 2 - c * 0.35, yb - 0.18, k * 0.6]], d * 0.5, 16, 6), 1), mats.copper));
+  }
+  return g;
+}
+
+// Flat racetrack coil standing on a face: normal along +X (side) or +Y (top).
+function faceCoil(L: number, W: number, H: number, mats: Mats, q: number) {
+  const { geometry } = racetrackCoilGeometry({ L, W, iL: L * 0.62, iW: Math.max(W * 0.28, 0.3), H, turns: 8, quality: q * 0.8 });
+  const m = new THREE.Mesh(geometry, mats.copper);
+  m.castShadow = true;
+  return m;
+}
+
+// AF + OIS carrier: a chamfered square body around a threaded bore, flat drive coils on three faces.
+export function oisCarrier(o: { S: number; D: number; H: number }, mats: Mats, q = 1) {
+  const g = new THREE.Group();
+  const body = new THREE.Group();
+  const S = o.S, c = S * 0.16, R = o.D / 2;
+  const add = (geo: THREE.BufferGeometry) => { const m = new THREE.Mesh(geo, mats.carrierBlack); m.castShadow = true; m.receiveShadow = true; body.add(m); return m; };
+  add(extrudeY(octShape(S * 0.86, c * 0.8, R), o.H, 0, 0.05));
+  add(extrudeY(octShape(S, c, R + 0.05), o.H * 0.16, 0, 0.04));            // bottom flange
+  add(extrudeY(octShape(S, c, R + 0.05), o.H * 0.16, o.H * 0.84, 0.04));   // top flange
+  body.add(threadedBore(R, o.H, 0, mats));
+  // corner bosses with terminal pads
+  for (const [x, z] of octPoints(S, c).filter((_, i) => i % 2 === 0)) {
+    const boss = new THREE.Mesh(new RoundedBoxGeometry(1.1, o.H * 0.5, 1.1, 2, 0.12), mats.carrierBlack);
+    boss.position.set(x * 0.9, o.H * 0.5, -z * 0.9);
+    boss.castShadow = true;
+    body.add(boss);
+    const pad = new THREE.Mesh(new RoundedBoxGeometry(0.7, 0.32, 0.5, 2, 0.06), mats.copperPolished);
+    pad.position.set(x * 0.98, o.H * 0.3, -z * 0.98);
+    body.add(pad);
+  }
+  // drive coils on +X and -X (AF / OIS-X) and on the top face (OIS-Y)
+  const cw = S * 0.56, ch = o.H * 0.62, ct = 0.55;
+  const basis = (cols: number[][]) => new THREE.Matrix4().makeBasis(new THREE.Vector3(...cols[0]), new THREE.Vector3(...cols[1]), new THREE.Vector3(...cols[2]));
+  const faces: [number[][], [number, number, number]][] = [
+    [[[0, 0, 1], [1, 0, 0], [0, 1, 0]], [S * 0.43, o.H / 2, 0]],
+    [[[0, 0, 1], [-1, 0, 0], [0, -1, 0]], [-S * 0.43, o.H / 2, 0]],
+    [[[1, 0, 0], [0, 0, -1], [0, 1, 0]], [0, o.H / 2, -S * 0.43]],
+  ];
+  for (const [cols, pos] of faces) {
+    const m = faceCoil(cw, ch, ct, mats, q);
+    m.setRotationFromMatrix(basis(cols));
+    m.position.set(...pos);
+    body.add(m);
+  }
+  // stand it on edge so the bore faces the camera, like it sits in a module
+  body.rotation.x = Math.PI / 2;
+  body.position.set(0, S / 2, -o.H / 2);
+  g.add(body);
+  return g;
+}
+
+// ---------------------------------------------------------------- wireless power, as built
+// Receiver coil on a nanocrystalline sheet: the thin, silvery disc is what keeps the stack under 0.5 mm.
+export function nanoRx(o: { OD: number; ID: number }, mats: Mats, q = 1) {
+  const g = new THREE.Group();
+  const R = o.OD / 2, Rs = R + 2.6, r0 = o.ID / 2;
+  const sh = new THREE.Shape();
+  const notch = 0.07;
+  sh.absarc(0, 0, Rs, Math.PI / 2 + notch, Math.PI / 2 + Math.PI * 2 - notch, false);
+  sh.lineTo(Math.cos(Math.PI / 2 - notch) * (Rs - 2.2), Math.sin(Math.PI / 2 - notch) * (Rs - 2.2));
+  sh.lineTo(Math.cos(Math.PI / 2 + notch) * (Rs - 2.2), Math.sin(Math.PI / 2 + notch) * (Rs - 2.2));
+  sh.closePath();
+  const sheet = new THREE.Mesh(extrudeY(sh, 0.12, -0.12, 0.02), mats.nanocrystal);
+  sheet.receiveShadow = true; sheet.castShadow = true;
+  g.add(sheet);
+  const core = new THREE.Mesh(new THREE.CylinderGeometry(r0 - 0.4, r0 - 0.4, 0.04, 96), mats.nanoCore);
+  core.position.y = 0.02;
+  g.add(core);
+  const turns = 21;
+  const wireR = ((R - r0) / turns) * 0.47;
+  const curve = new SpiralCurve(r0 + wireR, R - wireR, turns, wireR * 0.6);
+  const coil = new THREE.Mesh(tint(tube(curve, wireR, Math.round(turns * 150 * q), 8), 1), mats.litzPale);
+  coil.scale.y = 0.55; coil.castShadow = true;
+  g.add(coil);
+  // two flat leads leave through the notch, side by side
+  for (const k of [-1, 1]) {
+    const x = k * 1.1;
+    const lead = new THREE.Mesh(tint(path([[x * 0.6, wireR, -R + 0.6], [x, wireR * 1.2, -R - 1], [x, wireR * 1.2, -Rs - 4], [x * 1.05, wireR * 1.2, -Rs - R * 0.95]], wireR * 1.15, 40, 8), 1), mats.litzPale);
+    lead.scale.y = 0.6; lead.castShadow = true;
+    g.add(lead);
+    const tip = new THREE.Mesh(new RoundedBoxGeometry(0.75, 0.25, 1.6, 2, 0.1), mats.tin);
+    tip.position.set(x * 1.05, wireR, -Rs - R * 0.95 - 0.6);
+    g.add(tip);
+  }
+  // the inner end crossing out under the turns
+  const bridge = new THREE.Mesh(tint(path([[0, wireR, -r0 - wireR], [-0.5, wireR * 3, -R * 0.7], [-1.1, wireR * 2, -R + 0.6]], wireR * 1.05, 30, 8), 1), mats.litzPale);
+  bridge.scale.y = 0.6;
+  g.add(bridge);
+  return g;
+}
+
+// Rounded-rectangle spiral (for transmitter coils): radii grow separately in X and Z.
+class RectSpiralCurve extends THREE.Curve<THREE.Vector3> {
+  constructor(public a0: number, public b0: number, public a1: number, public b1: number, public turns: number, public y = 0, public p = 4) { super(); }
+  getPoint(t: number, target = new THREE.Vector3()) {
+    const ang = t * this.turns * Math.PI * 2;
+    const a = this.a0 + (this.a1 - this.a0) * t, b = this.b0 + (this.b1 - this.b0) * t;
+    const cx = Math.cos(ang), sz = Math.sin(ang);
+    const k = Math.pow(Math.pow(Math.abs(cx), this.p) + Math.pow(Math.abs(sz), this.p), -1 / this.p);
+    return target.set(cx * k * a, this.y, sz * k * b);
+  }
+}
+
+// One transmitter coil: litz wound in a rounded rectangle, both ends led out the top with Kapton over the exit.
+function txCoil(mats: Mats, q: number, y: number) {
+  const g = new THREE.Group();
+  const turns = 11, a0 = 10.5, b0 = 6.5, a1 = 22, b1 = 20;
+  const wireR = ((a1 - a0) / turns) * 0.5;
+  const curve = new RectSpiralCurve(a0 + wireR, b0 + wireR, a1 - wireR, b1 - wireR, turns, y + wireR * 0.6, 4);
+  const coil = new THREE.Mesh(tint(tube(curve, wireR, Math.round(turns * 150 * q), 8), 1), mats.litzPale);
+  coil.scale.y = 0.7; coil.castShadow = true; coil.receiveShadow = true;
+  g.add(coil);
+  const end = curve.getPoint(1);
+  for (const [k, x0] of [[0, end.x], [1, -2.2]] as [number, number][]) {
+    const z0 = k ? -b0 : end.z;
+    const lead = new THREE.Mesh(tint(path([[x0, y + wireR * (k ? 2.2 : 1), z0], [x0 + 2.6 + k * 0.6, y + wireR * 2.4, -b1 - 1], [x0 + 3 + k * 0.8, y + wireR * 2.4, -b1 - 9], [x0 + 3.2 + k * 0.8, y + wireR * 2.2, -b1 - 15]], wireR * 0.95, 40, 8), 1), mats.litzPale);
+    lead.castShadow = true;
+    g.add(lead);
+    const tip = new THREE.Mesh(new THREE.CylinderGeometry(wireR * 0.95, wireR * 0.95, 2.2, 12), mats.tin);
+    tip.rotation.x = Math.PI / 2; tip.position.set(x0 + 3.2 + k * 0.8, y + wireR * 2.2, -b1 - 16);
+    g.add(tip);
+  }
+  const tape = new THREE.Mesh(new RoundedBoxGeometry(7.5, 0.08, 6, 2, 0.03), mats.kapton);
+  tape.position.set(end.x * 0.5 + 0.6, y + wireR * 3.1, -b1 + 1.2);
+  g.add(tape);
+  return g;
+}
+
+// Two- or three-coil transmitter on a black ferrite sheet (A11 / MP-A13 style layouts).
+export function multiTx(n: 2 | 3, mats: Mats, q = 1) {
+  const g = new THREE.Group();
+  const pos: [number, number, number][] = n === 2 ? [[-13, 0, 0], [13, 1, 0]] : [[-22.5, 0, 0], [22.5, 0, 0], [0, 1, 0]];
+  const L = n === 2 ? 76 : 98, W = 50;
+  const sheet = new THREE.Mesh(new RoundedBoxGeometry(L, 0.8, W, 4, n === 2 ? 14 : 10), mats.ferrite);
+  sheet.position.y = -0.4; sheet.receiveShadow = true; sheet.castShadow = true;
+  g.add(sheet);
+  pos.forEach(([x, y, z]) => { const c = txCoil(mats, q, y); c.position.set(x, 0, z); g.add(c); });
+  return g;
+}
+
+// ---------------------------------------------------------------- linear motor drive coil
+// SMD drive coil: copper winding on a black bobbin base, steel core pin, tinned end-caps for reflow.
+export function smdDriveCoil(mats: Mats, q = 1) {
+  const g = new THREE.Group();
+  const base = new THREE.Mesh(new RoundedBoxGeometry(2.3, 0.75, 1.8, 3, 0.12), mats.carrierBlack);
+  base.position.y = 0.375; base.castShadow = true; base.receiveShadow = true;
+  g.add(base);
+  const step = new THREE.Mesh(new RoundedBoxGeometry(1.7, 0.18, 1.4, 2, 0.05), mats.carrierBlack);
+  step.position.y = 0.84; g.add(step);
+  for (const k of [-1, 1]) {
+    const cap = new THREE.Mesh(new RoundedBoxGeometry(0.42, 0.34, 0.5, 2, 0.08), mats.tin);
+    cap.position.set(k * 1.0, 0.22, 0.75); cap.castShadow = true;
+    g.add(cap);
+  }
+  const winding = ringStack(0.42, 11, 3, 0.085, mats, 0.93, q);
+  g.add(winding);
+  const fill = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.92, 64), mats.copper);
+  tint(fill.geometry, 0.75); fill.position.y = 1.39;
+  g.add(fill);
+  const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 1.7, 32), mats.steel);
+  pin.position.y = 1.55; pin.castShadow = true;
+  g.add(pin);
+  for (const k of [-1, 1]) {
+    g.add(new THREE.Mesh(tint(path([[k * 0.55, 1.0, 0.45], [k * 0.85, 0.85, 0.7], [k * 1.0, 0.45, 0.78]], 0.028, 20, 6), 1), mats.copper));
+  }
+  return g;
+}
+
 // ---------------------------------------------------------------- dispatch
 // Pick a model from a product's dims (shape + optional model hint) or slug.
 export function productModel(dims: any, slug: string, mats: Mats, q = 1): THREE.Group {
   const s = dims?.shape;
+  if (slug.includes('-cw')) return afCarrier({ S: dims.S, D: dims.D, H: dims.H, C: dims.C }, mats, q);
+  if (slug.includes('-cx')) return oisCarrier({ S: dims.S, D: dims.D, H: dims.H }, mats, q);
+  if (slug.includes('-dt')) return multiTx(2, mats, q);
+  if (slug.includes('-tt')) return multiTx(3, mats, q);
+  if (slug.includes('-dc0')) return smdDriveCoil(mats, q);
   if (slug.includes('rf')) return rfInductor({ OD: dims.OD || 3.5, H: dims.H || 4.2 }, mats);
   if (slug.includes('-tc')) return telecoil({ L: dims.L, W: dims.W, iL: dims.iL, iW: dims.iW, H: dims.H }, mats, q);
   if (slug.includes('-sv')) return solenoidCoil({ D: dims.D, L: dims.L, d: dims.d }, mats);
-  if (slug.includes('-rx')) return rxNfc({ OD: dims.OD, ID: dims.ID, T: dims.T }, mats, q);
+  if (slug.includes('-rx')) return nanoRx({ OD: dims.OD, ID: dims.ID }, mats, q);
   if (slug.includes('-mpp')) return wpcTx({ OD: dims.OD, ID: dims.ID, T: dims.T }, mats, { magnets: true }, q);
   if (slug.includes('st3')) return station({ L: 180, W: 90, H: 14 }, mats, q);
   switch (s) {
-    case 'racetrack': return racetrackCoil({ L: dims.L, W: dims.W, iL: dims.iL, iW: dims.iW, H: Math.max(dims.H, 0.5), turns: dims.W < 5 ? 9 : 12 }, mats, q);
+    case 'racetrack': return racetrackCoil({ L: dims.L, W: dims.W, iL: dims.iL, iW: dims.iW, H: Math.max(dims.H, 0.5), turns: dims.W < 5 ? 9 : 12, corner: dims.r }, mats, q);
     case 'ring': return voiceCoil({ OD: dims.OD, ID: dims.ID, H: dims.H }, mats, q);
     case 'bobbin': return bobbinCoil({ D: dims.D, L: dims.L, d: dims.d }, mats, { white: slug.includes('rl'), pins: slug.includes('rl') }, q);
     case 'spiral': return wpcTx({ OD: dims.OD, ID: dims.ID, T: dims.T }, mats, {}, q);
@@ -524,4 +798,4 @@ export function productModel(dims: any, slug: string, mats: Mats, q = 1): THREE.
   }
 }
 
-export { RoundRectCurve, SpiralCurve, HelixCurve, rng, tint, merge, tube, path, magnetRing, ringStack };
+export { RectSpiralCurve, octPoints, RoundRectCurve, SpiralCurve, HelixCurve, rng, tint, merge, tube, path, magnetRing, ringStack };

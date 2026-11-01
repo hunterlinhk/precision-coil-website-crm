@@ -459,3 +459,11 @@
 .check-list li::before { border-color: var(--copper); }
 .eq-table tbody tr { transition: background-color 0.2s; }
 .eq-table tbody tr:hover { background: rgba(196, 101, 44, 0.05); }
+
+/* uploaded product photos: thumbnail switcher on the stage */
+.photo-thumbs { position: absolute; left: 14px; top: 14px; z-index: 4; display: flex; flex-direction: column; gap: 8px; }
+.photo-thumbs button { width: 56px; height: 42px; padding: 0; border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 0, 0, 0.12); background: #fff; cursor: pointer; opacity: 0.7; transition: opacity 0.2s, border-color 0.2s; }
+.photo-thumbs button[aria-pressed='true'], .photo-thumbs button:hover { opacity: 1; border-color: var(--black); }
+.photo-thumbs img { width: 100%; height: 100%; object-fit: cover; }
+.stage-panel > .loupe { position: absolute; inset: 0; }
+.stage-panel > .loupe > img { width: 100%; height: 100%; object-fit: contain; }

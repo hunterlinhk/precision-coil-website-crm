@@ -271,8 +271,16 @@ export async function saveProduct(fd: FormData) {
   let dims = j(cur?.dims, {});
   try { dims = JSON.parse(s(fd, 'dims', 4000) || '{}'); } catch { /* keep */ }
 
-  const images = j<any[]>(cur?.images, []).filter((f) => !fd.getAll('remove_file').includes(f.id));
-  const files = j<any[]>(cur?.files, []).filter((f) => !fd.getAll('remove_file').includes(f.id));
+  // Photos: apply the order from the editor (first = main photo), removals, then replacements in place.
+  const removed = fd.getAll('remove_file').map(String);
+  const order = s(fd, 'image_order', 4000).split(',').filter(Boolean);
+  const rank = (fid: string) => { const i = order.indexOf(fid); return i < 0 ? 1e6 : i; };
+  const images = j<any[]>(cur?.images, []).sort((a, b) => rank(a.id) - rank(b.id)).filter((f) => !removed.includes(f.id));
+  for (let i = 0; i < images.length; i++) {
+    const rf = fd.get(`replace_${images[i].id}`);
+    if (rf instanceof File && rf.size) { const st = await saveUpload(rf, 'public'); if (st) images[i] = st; }
+  }
+  const files = j<any[]>(cur?.files, []).filter((f) => !removed.includes(f.id));
   for (const f of fd.getAll('new_images')) if (f instanceof File && f.size) { const st = await saveUpload(f, 'public'); if (st) images.push(st); }
   for (const f of fd.getAll('new_files')) if (f instanceof File && f.size) { const st = await saveUpload(f, 'public'); if (st) files.push(st); }
 

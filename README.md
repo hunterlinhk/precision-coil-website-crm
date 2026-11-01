@@ -45,7 +45,8 @@ A bilingual (English / 简体中文) B2B website for a precision coil manufactur
 
 **CMS**
 - Products and articles edited side by side in English and Chinese, with draft → preview → publish, unpublish, and delete.
-- Spec-table editor, product photos and PDF datasheets, parametric filter values, drawing geometry, application tags.
+- Spec-table editor, PDF datasheets, parametric filter values, drawing geometry, application tags.
+- **Product photos:** upload (drag and drop), reorder, make any photo the main one, replace a photo in place, or remove it. The main photo replaces the studio render everywhere on the site (catalogue, product page, related products); with several photos the product page shows thumbnails to switch between them. With no photos, the render is used.
 - Search-result preview with title/description length guidance per language.
 
 **Permissions**
@@ -115,7 +116,7 @@ npm run render                       # all shots (needs Playwright's Chromium)
 node scripts/render/run.mjs aw-vcm-af0806 && node scripts/render/reframe.mjs   # one shot
 ```
 
-- `lib/coil3d/models.ts`: procedural models for every product type, in millimetres, driven by each product's `dims`
+- `lib/coil3d/models.ts`: procedural models for every product type, in millimetres, driven by each product's `dims`. Modelled on the manufacturer's real parts: autofocus coils wound on octagonal lens carriers, AF + OIS carriers with flat drive coils, receiver coils on nanocrystalline sheet, two- and three-coil transmitters on ferrite with Kapton-taped leads, SMD linear-motor drive coils, and bonded copper air-core coils
 - `lib/coil3d/studio.ts`: softbox environment, key light, contact shadow and framing
 - `lib/coil3d/scenes.ts`: the product and manufacturing shots
 - `scripts/render/reframe.mjs`: crops every studio render to the same visual scale
