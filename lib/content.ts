@@ -16,12 +16,15 @@ export type Article = {
   title_en: string; title_zh: string; excerpt_en: string; excerpt_zh: string; body_en: string; body_zh: string;
   products: string[]; applications: string[]; reading_min: number; published_at: string; updated_at: string;
   seo_title_en: string; seo_title_zh: string; seo_desc_en: string; seo_desc_zh: string;
+  takeaways_en?: string; takeaways_zh?: string; cover?: string | null; author?: string | null;
+  // [question_en, answer_en, question_zh, answer_zh]
+  faq: [string, string, string, string][];
 };
 
 const hydrateProduct = (r: any): Product => r && ({
   ...r, specs: j(r.specs, []), params: j(r.params, {}), dims: j(r.dims, {}), applications: j(r.applications, []), images: j(r.images, []), files: j(r.files, []),
 });
-const hydrateArticle = (r: any): Article => r && ({ ...r, products: j(r.products, []), applications: j(r.applications, []) });
+const hydrateArticle = (r: any): Article => r && ({ ...r, products: j(r.products, []), applications: j(r.applications, []), faq: j(r.faq, []) });
 
 const PRODUCT_SELECT = `SELECT p.*, c.slug AS category_slug, c.shape AS shape FROM products p JOIN categories c ON c.id = p.category_id`;
 

@@ -7,7 +7,8 @@ import { applications } from '@/lib/applications';
 import { familyRender, productRenderName, renderSrc } from '@/lib/renders';
 import { familyTone } from '@/lib/tones';
 import { Render } from '@/components/site/Render';
-import { Marquee, WireCoil, Seal, SplitTitle, Arrow, CertMark, ScanOverlay } from '@/components/site/Flair';
+import { WireCoil, Seal, SplitTitle, Arrow, CertMark, ScanOverlay } from '@/components/site/Flair';
+import { LogoStrip } from '@/components/site/LogoStrip';
 import { Loupe, Ticker, HoverPreview, Reticle } from '@/components/site/motion';
 import { ArticleList } from '@/components/site/ArticleList';
 import { Gantt } from '@/components/site/Gantt';
@@ -39,14 +40,16 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
 
   const keyFacts: [string, string][] = zh
     ? [
-        ['这家公司生产什么？', `${site.brandZh}（${site.brand}）生产 VCM 线圈、空心线圈、骨架线圈、无线充电线圈、线性马达与无线充电器，工厂位于中国东莞与越南北宁。`],
-        ['VCM 线圈的市场份额是多少？', `全球约 ${share} 的 VCM（音圈马达）线圈出自其产线，年产线圈超过 6 亿颗。`],
-        ['是否接受按图定制？', `是。大部分产品按客户图纸绕制，线径最细 ${f.minWire} mm，提供 OEM 与 ODM 服务，工程师两个工作日内完成图纸评审。`],
+        ['这家公司生产什么？', `${site.brandZh}（${site.brand}）生产 VCM 线圈、空心线圈、骨架线圈、无线充电线圈、线性马达与无线充电器。`],
+        ['产能有多大？', `全品类线圈月产能约 2,000 万颗。全球约 ${share} 的 VCM（音圈马达）线圈出自我们的车间。`],
+        ['使用什么设备？', `${f.employees.replace('+', '')} 余名员工、${f.floorArea} 平方米车间，五十余台绕线机（大部分为日本进口日特设备）与三十余台焊锡、摆盘、视觉检测、自动组装与品质测试设备。`],
+        ['是否接受按图定制？', '是。大部分产品按客户图纸绕制，提供 OEM 与 ODM 服务。质量管理体系通过 ISO 9001 认证，材料符合 RoHS。'],
       ]
     : [
-        ['What does this company make?', `${site.brand} manufactures VCM coils, air-core coils, bobbin coils, wireless charging coils, linear motors and wireless chargers in Dongguan, China and Bắc Ninh, Vietnam.`],
-        ['What is its share of VCM coils?', `About ${share} of voice-coil-motor (VCM) coils shipped worldwide are wound on its lines; total output is more than 600 million coils a year.`],
-        ['Does it make custom coils?', `Yes. Most parts are wound to customer drawings, with wire down to ${f.minWire} mm, under OEM or ODM terms. Engineers review drawings within two working days.`],
+        ['What does this company make?', `${site.brand} manufactures VCM coils, air-core coils, bobbin coils, wireless charging coils, linear motors and wireless chargers.`],
+        ['How much can it make?', `Capacity is about 20 million coils a month across all types. About ${share} of voice-coil-motor (VCM) coils shipped worldwide are wound in its workshop.`],
+        ['What equipment does it use?', `A ${f.floorArea} m² workshop with more than 90 employees, more than 50 winding machines (most of them Nittoku machines imported from Japan) and more than 30 machines for soldering, tray loading, visual inspection, automated assembly and quality testing.`],
+        ['Does it make custom coils?', 'Yes. Most parts are wound to customer drawings under OEM or ODM terms. The quality management system is certified to ISO 9001 and materials are RoHS compliant.'],
       ];
 
   const [first, ...rest] = cats;
@@ -71,8 +74,8 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             </div>
             <p className="ticker">
               <span className="ticker-dot" aria-hidden="true" />
-              <Ticker perYear={600_000_000} locale={locale} />
-              <span className="ticker-label">{zh ? '颗线圈今天已经下线' : 'coils wound on our lines so far today'}</span>
+              <Ticker perYear={240_000_000} locale={locale} />
+              <span className="ticker-label">{zh ? '颗：按满产能估算的今日产量' : 'coils so far today at full capacity (estimate)'}</span>
             </p>
           </div>
           <div className="hero-visual">
@@ -81,7 +84,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
                 <div className="hero-coil-still"><Render name="hero-af" alt={`${h.specimen[0]} ${h.specimen[1]}`} sizes="(max-width: 900px) 100vw, 55vw" priority /></div>
               </Loupe>
             </div>
-            <Seal className="hero-seal" text={zh ? '自 2006 年 · 东莞 · 北宁 · 逐颗检测 · ' : 'SINCE 2006 · DONGGUAN · BẮC NINH · '} />
+            <Seal className="hero-seal" text={zh ? `自 ${site.founded} 年 · 日特绕线 · 逐颗检测 · ` : `SINCE ${site.founded} · NITTOKU WOUND · TESTED · `} />
             <p className="specimen" data-draw>
               <svg viewBox="0 0 52 18" aria-hidden="true"><path d="M1 9h50M1 3v12M51 3v12" stroke="currentColor" strokeWidth="1" fill="none" /><path d="M1 9l6-3v6zM51 9l-6-3v6z" fill="currentColor" /></svg>
               <span><strong>{h.specimen[0]}</strong> {h.specimen[1]}</span>
@@ -90,13 +93,13 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         </div>
       </section>
 
-      <Marquee tone="dark" items={cats.map((c) => ({ label: L(c, 'name', locale), render: familyRender[c.slug], tone: familyTone[c.slug] }))} />
+      <LogoStrip locale={locale} />
 
       {/* ---------- Macro: precision at a scale you cannot see ---------- */}
       <section className="macro dark" aria-labelledby="macro-title" data-scroll>
         <div className="macro-img"><Render name="macro-turns" alt={h.macroCaption} sizes="(max-width: 900px) 100vw, 70vw" /><Reticle widthMm={2.4} /></div>
         <div className="wrap macro-inner">
-          <p className="kicker macro-kicker" data-reveal>{zh ? '放大 × 200' : 'Magnified × 200'}</p>
+          <p className="kicker macro-kicker" data-reveal>{zh ? '放大观察' : 'Under magnification'}</p>
           <p className="figure macro-figure cu-text" aria-hidden="true" data-count data-from="1.000" data-dur="2200">{f.minWire}<small>mm</small></p>
           <div className="macro-copy" data-reveal>
             <h2 id="macro-title">{h.macroTitle}</h2>
@@ -149,7 +152,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
       {/* ---------- Volume and process ---------- */}
       <section className="dark" aria-labelledby="volume-title">
         <div className="wrap volume-head">
-          <p className="kicker" data-reveal><span className="count-pill"><span data-count>600,000,000</span>+</span> {zh ? '颗 / 年' : 'coils a year'}</p>
+          <p className="kicker" data-reveal><span className="count-pill"><span data-count>20,000,000</span></span> {zh ? '颗 / 月' : 'coils a month'}</p>
           <h2 id="volume-title" className="h1" data-reveal>{h.volumeTitle}</h2>
         </div>
         <div className="volume-hero" data-reveal>
@@ -169,11 +172,11 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             ))}
           </ol>
           <dl className="facts" data-stagger>
-            <div><dt>{h.facts.lines}</dt><dd className="figure" data-count>{f.windingLines}</dd></div>
-            <div><dt>{h.facts.plants}</dt><dd className="figure" data-count>2</dd></div>
+            <div><dt>{h.facts.monthly}</dt><dd className="figure"><span data-count>20</span>M</dd></div>
+            <div><dt>{h.facts.winders}</dt><dd className="figure" data-count>{f.windingMachines}</dd></div>
+            <div><dt>{h.facts.support}</dt><dd className="figure" data-count>{f.supportMachines}</dd></div>
             <div><dt>{h.facts.area}</dt><dd className="figure" data-count>{f.floorArea}</dd></div>
-            <div><dt>{h.facts.ppm}</dt><dd className="figure" data-count data-from="300">{f.ppm}</dd></div>
-            <div><dt>{h.facts.otd}</dt><dd className="figure" data-count data-from="90.0">{f.onTimeDelivery}</dd></div>
+            <div><dt>{h.facts.people}</dt><dd className="figure" data-count>{f.employees}</dd></div>
           </dl>
           <p style={{ marginTop: 40 }}><Link href={`${base}/manufacturing`} className="link">{h.mfgLink}</Link></p>
         </div>

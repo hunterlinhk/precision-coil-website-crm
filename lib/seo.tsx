@@ -31,8 +31,9 @@ export function orgJsonLd(locale: Locale) {
     description: locale === 'zh'
       ? `精密线圈制造商：VCM 线圈（约占全球出货量 ${site.facts.vcmShare}）、空心线圈、骨架线圈、无线充电线圈、线性马达与无线充电器。`
       : `Precision coil manufacturer: VCM coils (${site.facts.vcmShare} of global shipments), air-core coils, bobbin coils, wireless charging coils, linear motors and wireless chargers.`,
-    hasCredential: site.certifications.map((c) => ({ '@type': 'EducationalOccupationalCredential', name: c.code })),
-    knowsAbout: ['VCM coil', 'voice coil motor', 'air-core coil', 'bobbin coil', 'wireless charging coil', 'Qi2', 'linear resonant actuator', 'precision coil winding', 'OEM', 'ODM'],
+    hasCertification: [{ '@type': 'Certification', name: 'ISO 9001', about: 'Quality management system' }],
+    numberOfEmployees: { '@type': 'QuantitativeValue', minValue: 90 },
+    knowsAbout: ['VCM coil', 'voice coil motor', 'autofocus coil', 'optical image stabilization coil', 'air-core coil', 'bobbin coil', 'wireless charging coil', 'nanocrystalline magnetic sheet', 'Qi2', 'linear motor', 'precision coil winding', 'Nittoku winding machine', 'OEM', 'ODM'],
   };
 }
 
@@ -51,18 +52,23 @@ export function productJsonLd(p: Product, locale: Locale, url: string) {
   };
 }
 
-export function articleJsonLd(a: Article, locale: Locale, url: string) {
+export function articleJsonLd(a: Article, locale: Locale, url: string, image?: string) {
+  const zh = locale === 'zh';
   return {
     '@context': 'https://schema.org',
     '@type': a.type === 'news' ? 'NewsArticle' : 'TechArticle',
     headline: L(a, 'title', locale),
     description: L(a, 'excerpt', locale),
+    ...(L(a, 'takeaways', locale) ? { abstract: L(a, 'takeaways', locale) } : {}),
+    ...(image ? { image: image.startsWith('http') ? image : `${site.url}${image}` } : {}),
     datePublished: (a.published_at || a.updated_at)?.replace(' ', 'T') + 'Z',
     dateModified: a.updated_at?.replace(' ', 'T') + 'Z',
-    inLanguage: locale === 'zh' ? 'zh-CN' : 'en',
+    inLanguage: zh ? 'zh-CN' : 'en',
     url,
-    author: { '@id': `${site.url}/#org` },
+    mainEntityOfPage: url,
+    author: { '@type': 'Organization', name: a.author || site.brand, url: site.url },
     publisher: { '@id': `${site.url}/#org` },
+    ...(a.products.length ? { mentions: a.products.map((s) => ({ '@type': 'Product', name: s.toUpperCase() })) } : {}),
   };
 }
 

@@ -7,7 +7,9 @@ import { getArticle, getProductsByModels, getArticles } from '@/lib/content';
 import { getApplication } from '@/lib/applications';
 import { currentUser, can } from '@/lib/auth';
 import { Markdown } from '@/lib/markdown';
-import { alternates, JsonLd, articleJsonLd } from '@/lib/seo';
+import { alternates, JsonLd, articleJsonLd, faqJsonLd, breadcrumbJsonLd } from '@/lib/seo';
+import { ArticleList } from '@/components/site/ArticleList';
+import { renderSrc, hasRender } from '@/lib/renders';
 import { Breadcrumbs, fmtDate } from '@/components/site/ArticleList';
 import { MiniProducts } from '@/components/site/MiniProducts';
 import { SplitTitle } from '@/components/site/Flair';
@@ -39,6 +41,11 @@ export default async function Page({ params, searchParams }: P) {
   const base = `/${locale}`;
   const prods = getProductsByModels(a.products);
   const more = getArticles({ limit: 4 }).filter((x) => x.slug !== a.slug).slice(0, 3);
+  const zh = locale === 'zh';
+  const takeaways = L(a, 'takeaways', locale);
+  const faq: [string, string][] = (a.faq || []).map((f) => (zh ? [f[2] || f[0], f[3] || f[1]] : [f[0], f[1]]) as [string, string]).filter(([q, ans]) => q && ans);
+  const image = a.cover ? `/api/media/${a.cover}` : renderSrc(a.products.find(hasRender) || 'section')?.src;
+  const url = `${site.url}${base}/resources/${slug}`;
   return (
     <>
       {a.status !== 'published' && <div className="draft-banner">{d.products.draftBanner}</div>}
@@ -50,11 +57,26 @@ export default async function Page({ params, searchParams }: P) {
           <div className="article-meta">
             <time dateTime={a.published_at || a.updated_at}>{fmtDate(a.published_at || a.updated_at, locale)}</time>
             <span>{a.reading_min} {d.res.read}</span>
-            <span>{site.brand} {locale === 'zh' ? '工程团队' : 'engineering team'}</span>
+            <span>{a.author || site.brand}</span>
           </div>
         </header>
+        {a.cover && <figure className="article-cover"><img src={`/api/media/${a.cover}`} alt="" /></figure>}
+        {takeaways && (
+          <aside className="takeaways" aria-label={zh ? '要点' : 'Key points'}>
+            <h2>{zh ? '要点' : 'Key points'}</h2>
+            <p>{takeaways}</p>
+          </aside>
+        )}
         <div className="article-layout">
-          <article className="prose"><Markdown source={L(a, 'body', locale)} /></article>
+          <article className="prose">
+            <Markdown source={L(a, 'body', locale)} />
+            {faq.length > 0 && (
+              <section className="article-faq">
+                <h2>{zh ? '常见问题' : 'Questions and answers'}</h2>
+                <dl className="faq">{faq.map(([q, ans]) => <div key={q}><dt>{q}</dt><dd>{ans}</dd></div>)}</dl>
+              </section>
+            )}
+          </article>
           <aside className="article-aside">
             {a.applications.length > 0 && (
               <div>
@@ -84,20 +106,14 @@ export default async function Page({ params, searchParams }: P) {
             <h2 className="h2" data-reveal>{d.home.resourcesTitle}</h2>
             <div className="head-aside"><Link href={`${base}/resources`} className="link">{d.res.back}</Link></div>
           </header>
-          <ul className="articles">
-            {more.map((m) => (
-              <li key={m.slug}>
-                <Link href={`${base}/resources/${m.slug}`} className="article-card">
-                  <span className={`kind kind-${m.type}`}>{d.res[m.type]}</span>
-                  <h3>{L(m, 'title', locale)}</h3>
-                  <p>{L(m, 'excerpt', locale)}</p>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <ArticleList articles={more} locale={locale} />
         </div>
       </section>
-      <JsonLd data={articleJsonLd(a, locale, `${site.url}${base}/resources/${slug}`)} />
+      <JsonLd data={[
+        articleJsonLd(a, locale, url, image),
+        ...(faq.length ? [faqJsonLd(faq)] : []),
+        breadcrumbJsonLd([[d.res.title, `${base}/resources`], [L(a, 'title', locale), `${base}/resources/${slug}`]]),
+      ]} />
     </>
   );
 }

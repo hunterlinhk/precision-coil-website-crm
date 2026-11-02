@@ -124,27 +124,21 @@ export function ScanOverlay({ zh }: { zh: boolean }) {
   );
 }
 
-// Two plants, one process: a dot-matrix strip of the region with a shuttle line between them.
-export function PlantsMap({ a, b, km }: { a: string; b: string; km: string }) {
-  const dots: [number, number][] = [];
-  for (let x = 6; x < 1200; x += 12) for (let y = 6; y < 240; y += 12) {
-    // a loose coastline: land above a wavy line
-    const coast = 170 + 38 * Math.sin(x / 140) + 22 * Math.cos(x / 53) - (x > 760 ? (x - 760) * 0.12 : 0);
-    if (y < coast) dots.push([x, y]);
-  }
-  const route = 'M330 150 C 480 40, 720 30, 880 112';
+// The machine floor at a glance: one square per machine, winders in copper, supporting machines in outline.
+export function MachineFloor({ zh }: { zh: boolean }) {
+  const winders = 50, support = 30;
+  const cell = (k: number, cls: string) => <i key={`${cls}${k}`} className={cls} style={{ ['--i' as any]: k }} />;
   return (
-    <figure className="plants-map" data-reveal>
-      <svg viewBox="0 0 1200 240" aria-hidden="true">
-        {dots.map(([x, y]) => <circle key={`${x}-${y}`} cx={x} cy={y} r="1.3" className="pm-dot" />)}
-        <path d={route} className="pm-route" />
-        <path d={route} className="pm-shuttle" pathLength={1} />
-        <g className="pm-pin" transform="translate(880 112)"><circle r="16" className="pm-ping" /><circle r="6" /></g>
-        <g className="pm-pin" transform="translate(330 150)"><circle r="16" className="pm-ping" /><circle r="6" /></g>
-        <text x="880" y="146" textAnchor="middle" className="pm-label">{a}</text>
-        <text x="330" y="184" textAnchor="middle" className="pm-label">{b}</text>
-        <text x="605" y="40" textAnchor="middle" className="pm-km">{km}</text>
-      </svg>
+    <figure className="floor" data-reveal>
+      <div className="floor-group">
+        <div className="floor-grid floor-w">{Array.from({ length: winders }, (_, k) => cell(k, 'm-w'))}<span className="floor-plus">+</span></div>
+        <figcaption><strong>{zh ? '50 余台绕线机' : '50+ winding machines'}</strong>{zh ? '多种机型，大部分为日本进口日特（Nittoku）设备' : 'Several types, most of them Nittoku machines imported from Japan'}</figcaption>
+      </div>
+      <div className="floor-group">
+        <div className="floor-grid floor-s">{Array.from({ length: support }, (_, k) => cell(k, 'm-s'))}<span className="floor-plus">+</span></div>
+        <figcaption><strong>{zh ? '30 余台配套设备' : '30+ supporting machines'}</strong>{zh ? '焊锡 · 摆盘 · 视觉检测 · 自动组装 · 品质测试' : 'Soldering · tray loading · visual inspection · automated assembly · quality testing'}</figcaption>
+      </div>
+      <p className="floor-note">{zh ? '1,800 m² 车间 · 90 余名员工 · 每个方块代表一台设备' : '1,800 m² workshop · 90+ employees · each square is one machine'}</p>
     </figure>
   );
 }

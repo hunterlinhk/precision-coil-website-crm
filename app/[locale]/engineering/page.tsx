@@ -37,11 +37,11 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
   const faq: [string, string][] = zh ? [
     ['提交图纸前需要签署保密协议吗？', '可以先签。勾选表单中的保密选项，我们会在查看文件前发送保密协议。'],
     ['开发费用如何计算？', '使用现有线材与骨架时通常只收治具费，量产后可按约定返还。新骨架模具单独报价。'],
-    ['可以只做小批量吗？', '可以。越南工厂的柔性产线适合每月数千至数十万件的项目。'],
+    ['可以只做小批量吗？', '可以。样品与小批量订单都可以按图纸生产，起订量取决于是否需要新治具。'],
   ] : [
     ['Can we sign an NDA before sending drawings?', 'Yes. Tick the confidentiality option on the form and we send our NDA before opening your files.'],
     ['How are development costs handled?', 'With existing wire and bobbin materials there is usually only a fixture charge, refundable against production orders. New bobbin tooling is quoted separately.'],
-    ['Do you take lower-volume programmes?', 'Yes. Flexible cells in Vietnam suit programmes from a few thousand to a few hundred thousand pieces a month.'],
+    ['Do you take lower-volume programmes?', 'Yes. Samples and small batches are wound to drawing; the minimum order depends on whether new fixtures are needed.'],
   ];
   return (
     <>
@@ -55,7 +55,7 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
               <Link href={`${base}/contact?type=drawing`} className="btn btn-solid btn-arrow" data-magnetic>{d.eng.brief}<Arrow /></Link>
             </div>
           </div>
-          <div className="cat-hero-art" style={{ background: '#fff', padding: '4%' }} data-draw><DimensionDrawing dims={{ shape: 'racetrack', L: 8, W: 6, iL: 5.2, iW: 3.2, H: 0.9 }} model="AW-VCM-AF0806" /></div>
+          <div className="cat-hero-art" style={{ background: '#fff', padding: '4%' }} data-draw><DimensionDrawing dims={{ shape: 'racetrack', L: 8, W: 6, iL: 6.4, iW: 4.4, H: 0.5 }} model="AW-VCM-AF0806" /></div>
         </div>
       </div>
 

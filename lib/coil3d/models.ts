@@ -171,6 +171,50 @@ export function racetrackCoilGeometry(o: { L: number; W: number; iL: number; iW:
   return { geometry: merge(gs), winding: { turns, layers, d } as Winding };
 }
 
+// Fine-wire racetrack coil at true wire scale. Only the turns you can see are modelled as wire
+// (the top layer and the inner and outer walls); a solid copper core fills the rest.
+export function fineRacetrackGeometry(o: { L: number; W: number; iL: number; iW: number; H: number; wire: number; corner?: number; quality?: number }) {
+  const q = o.quality ?? 1;
+  const t = Math.min((o.L - o.iL) / 2, (o.W - o.iW) / 2);
+  const d = Math.max(o.wire * 1.08, t / 60); // enamelled diameter, capped so huge counts stay renderable
+  const turns = Math.max(4, Math.floor(t / d));
+  const layers = Math.max(2, Math.floor((o.H - d) / (d * 0.866)) + 1);
+  const r0 = o.corner ?? Math.min(o.iW / 2, o.iL / 2);
+  const rand = rng(5);
+  const gs: THREE.BufferGeometry[] = [];
+  const radial = Math.max(5, Math.round(6 * q));
+  const ring = (off: number, y: number) => {
+    const L = o.iL + 2 * off, W = o.iW + 2 * off, r = r0 + off;
+    const per = 2 * (L + W);
+    const segs = Math.min(900, Math.max(96, Math.round((per / d) * 0.5 * q)));
+    gs.push(tint(tube(new RoundRectCurve(L, W, r, y), d * 0.48, segs, radial, true), 0.84 + rand() * 0.22));
+  };
+  const topY = d / 2 + (layers - 1) * d * 0.866;
+  const topShift = (layers - 1) % 2 ? 0.5 : 0;
+  for (let i = 0; i < turns - (topShift ? 1 : 0); i++) ring(d * (i + 0.5 + topShift), topY);
+  for (let j = 0; j < layers - 1; j++) {
+    const shift = j % 2 ? 0.5 : 0;
+    const y = d / 2 + j * d * 0.866;
+    ring(d * (0.5 + shift), y);                                     // inner wall
+    ring(d * (turns - 0.5 - (j % 2 ? 0.5 : 0)), y);                 // outer wall
+  }
+  // solid fill behind the visible turns
+  const fill = new THREE.Shape();
+  const outer = new RoundRectCurve(o.iL + 2 * (t - d), o.iW + 2 * (t - d), r0 + t - d, 0);
+  const inner = new RoundRectCurve(o.iL + 2 * d, o.iW + 2 * d, r0 + d, 0);
+  const P = (c: RoundRectCurve, n: number) => Array.from({ length: n }, (_, k) => { const p = c.getPoint(k / n); return new THREE.Vector2(p.x, -p.z); });
+  fill.setFromPoints(P(outer, 240));
+  const hole = new THREE.Path(P(inner, 240).reverse());
+  fill.holes.push(hole);
+  const core = new THREE.ExtrudeGeometry(fill, { depth: Math.max(topY - d * 0.3, d), bevelEnabled: false, curveSegments: 4 });
+  core.rotateX(-Math.PI / 2);
+  core.translate(0, d * 0.2, 0);
+  gs.push(tint(core.toNonIndexed(), 0.62));
+  const merged = mergeGeometries(gs.map((g) => (g.index ? g.toNonIndexed() : g)), false)!;
+  gs.forEach((g) => g.dispose());
+  return { geometry: merged, winding: { turns, layers, d } as Winding, top: topY };
+}
+
 // Two lead wires leaving the outer turn.
 function leads(L: number, W: number, d: number, h: number, mats: Mats, opts: { len?: number; spread?: number; side?: 'x' | 'z' } = {}) {
   const g = new THREE.Group();
@@ -190,9 +234,17 @@ function leads(L: number, W: number, d: number, h: number, mats: Mats, opts: { l
   return g;
 }
 
-export function racetrackCoil(o: { L: number; W: number; iL: number; iW: number; H: number; turns?: number; corner?: number }, mats: Mats, quality = 1) {
-  const { geometry, winding } = racetrackCoilGeometry({ ...o, quality });
+export function racetrackCoil(o: { L: number; W: number; iL: number; iW: number; H: number; turns?: number; corner?: number; wire?: number }, mats: Mats, quality = 1) {
   const g = new THREE.Group();
+  if (o.wire) {
+    const { geometry, winding, top } = fineRacetrackGeometry({ ...o, wire: o.wire, quality });
+    const m = new THREE.Mesh(geometry, mats.copper);
+    m.castShadow = true; m.receiveShadow = true;
+    g.add(m);
+    g.add(leads(o.L, o.W, Math.max(winding.d, 0.02), top, mats, { spread: Math.max(winding.d * 3, 0.12) }));
+    return g;
+  }
+  const { geometry, winding } = racetrackCoilGeometry({ ...o, quality });
   const m = new THREE.Mesh(geometry, mats.copper);
   m.castShadow = true; m.receiveShadow = true;
   g.add(m);
@@ -787,7 +839,7 @@ export function productModel(dims: any, slug: string, mats: Mats, q = 1): THREE.
   if (slug.includes('-mpp')) return wpcTx({ OD: dims.OD, ID: dims.ID, T: dims.T }, mats, { magnets: true }, q);
   if (slug.includes('st3')) return station({ L: 180, W: 90, H: 14 }, mats, q);
   switch (s) {
-    case 'racetrack': return racetrackCoil({ L: dims.L, W: dims.W, iL: dims.iL, iW: dims.iW, H: Math.max(dims.H, 0.5), turns: dims.W < 5 ? 9 : 12, corner: dims.r }, mats, q);
+    case 'racetrack': return racetrackCoil({ L: dims.L, W: dims.W, iL: dims.iL, iW: dims.iW, H: Math.max(dims.H, 0.5), turns: dims.W < 5 ? 9 : 12, corner: dims.r, wire: dims.wire }, mats, q);
     case 'ring': return voiceCoil({ OD: dims.OD, ID: dims.ID, H: dims.H }, mats, q);
     case 'bobbin': return bobbinCoil({ D: dims.D, L: dims.L, d: dims.d }, mats, { white: slug.includes('rl'), pins: slug.includes('rl') }, q);
     case 'spiral': return wpcTx({ OD: dims.OD, ID: dims.ID, T: dims.T }, mats, {}, q);

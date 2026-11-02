@@ -175,7 +175,7 @@ function airFamily(m: Mats, q: number) {
 }
 
 export const shots: Record<string, Shot> = {
-  'hero-af': { build: (m, q) => racetrackCoil({ ...AF, turns: 13 }, m, q * 1.4), view: { az: 26, el: 38, fill: 0.86 }, mode: 'light', size: [2000, 1700], ss: 1.6 },
+  'hero-af': { build: (m, q) => racetrackCoil({ L: 8, W: 6, iL: 6.4, iW: 4.4, H: 0.5, wire: 0.05 }, m, q * 1.4), view: { az: 26, el: 38, fill: 0.86 }, mode: 'light', size: [2000, 1700], ss: 1.6 },
   'macro-turns': { build: (m, q) => racetrackCoil({ ...AF, turns: 13 }, m, q * 1.6), view: { az: 62, el: 16, fov: 16, target: [3.4, 0.25, 1.6], dist: 7.5, ground: false }, mode: 'dark', size: [2400, 1350], ss: 1.5 },
   tray: { build: tray, view: { az: 22, el: 34, fov: 26, fill: 2.1, target: [4, 0, 4], ground: false }, mode: 'dark', size: [2400, 1500], ss: 1.5 },
   winding: { build: winding, view: { az: 32, el: 13, fov: 24, fill: 1.9, target: [7, 3, 0], ground: false }, mode: 'dark', size: [1800, 2000], ss: 1.5 },

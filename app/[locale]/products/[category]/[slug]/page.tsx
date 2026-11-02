@@ -41,17 +41,16 @@ export async function generateMetadata({ params, searchParams }: P): Promise<Met
 
 function productFaq(p: Product, locale: Locale): [string, string][] {
   const zh = locale === 'zh';
-  const vietnam = ['air-core-coils', 'bobbin-coils', 'linear-motors'].includes(p.category_slug);
   return zh ? [
-    [`${p.model} 的最小起订量是多少？`, '样品 10 件起。量产起订量取决于是否需要新治具，标准线圈通常为 10,000 件。'],
-    [`${p.model} 的打样周期多久？`, '使用现有治具约 1 周；需要新治具时为 2–3 周，并附首件尺寸与电性能报告。'],
+    [`${p.model} 的最小起订量是多少？`, '可提供样品。量产起订量取决于具体零件以及是否需要新治具，请告诉我们预计用量。'],
+    [`${p.model} 的打样周期多久？`, '取决于是否需要新治具。询价时我们会根据您的图纸给出具体交期。'],
     [`${p.model} 可以定制吗？`, L(p, 'custom', locale) || '可以，尺寸、线径与端子均可按图纸调整。'],
-    ['在哪里生产？', vietnam ? '可在中国东莞或越南北宁生产，两地使用相同工艺规范，可双基地供货。' : '在中国东莞总部工厂生产。'],
+    ['用什么设备生产？', '在我们的车间生产：五十余台绕线机（大部分为日本进口日特设备），配合焊锡、视觉检测与品质测试设备。'],
   ] : [
-    [`What is the MOQ for ${p.model}?`, 'Samples from 10 pieces. Production MOQ depends on whether new fixtures are needed; for standard coils it is typically 10,000 pieces.'],
-    [`How long do ${p.model} samples take?`, 'About one week from existing fixtures, or 2–3 weeks when new fixtures are needed, shipped with a dimensional and electrical first-article report.'],
+    [`What is the MOQ for ${p.model}?`, 'Samples are available. The production MOQ depends on the part and on whether new fixtures are needed; tell us your expected volume.'],
+    [`How long do ${p.model} samples take?`, 'It depends on whether new fixtures are needed. We confirm the lead time with the quotation, based on your drawing.'],
     [`Can ${p.model} be customized?`, L(p, 'custom', locale) || 'Yes. Dimensions, wire and terminations can be changed to your drawing.'],
-    ['Where is it produced?', vietnam ? 'In Dongguan, China or Bắc Ninh, Vietnam, under the same process specification, so it can be dual-sourced.' : 'At our headquarters plant in Dongguan, China.'],
+    ['What equipment is it made on?', 'In our own workshop, on more than 50 winding machines (most of them Nittoku machines imported from Japan), with soldering, visual inspection and quality-testing machines.'],
   ];
 }
 
@@ -120,8 +119,8 @@ export default async function ProductPage({ params, searchParams }: P) {
               <Link href={`${base}/products/${category}/${slug}/datasheet`} className="btn btn-line">{d.products.datasheet}</Link>
             </div>
             <p className="pd-meta">
-              <span>{zh ? '样品 10 件起' : 'Samples from 10 pcs'}</span>
-              <span>{zh ? '首样 1–3 周' : 'First articles in 1–3 weeks'}</span>
+              <span>{zh ? '可提供样品' : 'Samples available'}</span>
+              <span>{zh ? '可按图定制' : 'Made to your drawing'}</span>
               <a href="#custom">{d.products.custom}</a>
             </p>
           </div>

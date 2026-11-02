@@ -40,8 +40,8 @@ export const categories = [
     slug: 'wireless-chargers', shape: 'module', sort: 6,
     name_en: 'Wireless chargers', name_zh: '无线充电器',
     short_en: 'Qi2 modules and finished chargers, OEM/ODM', short_zh: 'Qi2 模块与成品充电器，OEM/ODM',
-    summary_en: 'Charger modules and finished products built around our own coils: magnetic Qi2 pads, multi-device stations and in-vehicle modules.',
-    summary_zh: '基于自产线圈的充电模块与成品：磁吸 Qi2 充电板、多设备充电座及车载模块。',
+    summary_en: 'Charger modules and finished products built around our own coils: magnetic Qi2 pads and multi-device stations.',
+    summary_zh: '基于自产线圈的充电模块与成品：磁吸 Qi2 充电板与多设备充电座。',
   },
 ];
 
@@ -53,16 +53,16 @@ export const products = [
   {
     slug: 'aw-vcm-af0806', cat: 'vcm-coils', model: 'AW-VCM-AF0806', featured: 1,
     name_en: 'Autofocus coil, 8.0 × 6.0 mm', name_zh: '自动对焦线圈 8.0 × 6.0 mm',
-    summary_en: 'Racetrack self-bonding coil for 1/2.8" to 1/2" main-camera AF actuators.',
-    summary_zh: '适用于 1/2.8" 至 1/2" 主摄自动对焦马达的自粘跑道形线圈。',
-    body_en: 'A compact racetrack coil wound orthocyclically from 0.040 mm self-bonding wire and hot-air bonded in the fixture, so it holds its shape without a bobbin. The inner window is held to ±0.02 mm so the coil drops onto the lens carrier without shimming.\n\nEvery coil is 100% tested for resistance, inductance and layer short before packing in anti-static trays.',
-    body_zh: '采用 0.040 mm 自粘漆包线正交排绕，并在治具中热风固化，无需骨架即可保持形状。内窗尺寸公差控制在 ±0.02 mm，可直接装配到镜头载体上。\n\n每颗线圈出货前均 100% 检测电阻、电感与层间短路，并以防静电托盘包装。',
+    summary_en: 'Racetrack self-bonding air-core coil for main-camera autofocus actuators.',
+    summary_zh: '适用于主摄自动对焦马达的自粘跑道形空心线圈。',
+    body_en: 'A compact racetrack coil wound orthocyclically from 0.050 mm self-bonding wire and bonded in the fixture, so it holds its shape without a bobbin.\n\nEvery coil is tested for resistance and inductance before packing in anti-static trays.',
+    body_zh: '采用 0.050 mm 自粘漆包线正交排绕，并在治具中粘合，无需骨架即可保持形状。\n\n每颗线圈出货前均检测电阻与电感，并以防静电托盘包装。',
     custom_en: 'Wire 0.030–0.060 mm, window and height to drawing, terminal lead length, resistance from 8 to 30 Ω.',
     custom_zh: '线径 0.030–0.060 mm，内窗与高度按图纸定制，引线长度可调，电阻 8–30 Ω。',
-    specs: [s('outline', 'Outline (L × W)', '外形 (长 × 宽)', '8.00 × 6.00', 'mm'), s('window', 'Inner window', '内窗', '5.20 × 3.20', 'mm'), s('height', 'Height', '高度', '0.90 ±0.03', 'mm'), s('wire', 'Wire', '线径', '0.040 mm self-bonding'), s('turns', 'Turns', '圈数', '118'), s('resistance', 'DC resistance @20 °C', '直流电阻 @20 °C', '12.5 ±5%', 'Ω'), s('inductance', 'Inductance @1 kHz', '电感 @1 kHz', '58 ±10%', 'µH'), s('temp', 'Operating temp.', '工作温度', '−30 to +85', '°C')],
-    params: { od: 8.0, h: 0.9, wire: 0.04, r: 12.5, l: 58, turns: 118 },
-    dims: { shape: 'racetrack', L: 8.0, W: 6.0, iL: 5.2, iW: 3.2, H: 0.9 },
-    applications: ['smartphone-cameras'],
+    specs: [s('outline', 'Outline (L × W)', '外形 (长 × 宽)', '8.00 × 6.00', 'mm'), s('window', 'Inner window', '内窗', '6.40 × 4.40', 'mm'), s('height', 'Height', '高度', '0.50 ±0.03', 'mm'), s('wire', 'Wire', '线径', '0.050 mm self-bonding'), s('turns', 'Turns', '圈数', '140'), s('resistance', 'DC resistance @20 °C', '直流电阻 @20 °C', '30 ±5%', 'Ω'), s('inductance', 'Inductance @1 kHz', '电感 @1 kHz', '82 ±10%', 'µH'), s('temp', 'Operating temp.', '工作温度', '−30 to +85', '°C')],
+    params: { od: 8.0, h: 0.5, wire: 0.05, r: 30, l: 82, turns: 140 },
+    dims: { shape: 'racetrack', L: 8.0, W: 6.0, iL: 6.4, iW: 4.4, H: 0.5, wire: 0.05 },
+    applications: ['smartphone-cameras', 'surveillance-cameras'],
   },
   {
     slug: 'aw-vcm-ois1210', cat: 'vcm-coils', model: 'AW-VCM-OIS1210', featured: 1,
@@ -90,7 +90,7 @@ export const products = [
     specs: [s('outline', 'Outline (L × W)', '外形 (长 × 宽)', '16.00 × 4.00', 'mm'), s('window', 'Inner window', '内窗', '13.40 × 1.40', 'mm'), s('height', 'Height', '高度', '1.20 ±0.03', 'mm'), s('wire', 'Wire', '线径', '0.045 mm self-bonding'), s('turns', 'Turns', '圈数', '140'), s('resistance', 'DC resistance @20 °C', '直流电阻 @20 °C', '22.0 ±5%', 'Ω'), s('flatness', 'Side-wall bulge', '侧壁鼓胀', '≤ 0.02', 'mm')],
     params: { od: 16.0, h: 1.2, wire: 0.045, r: 22, l: 96, turns: 140 },
     dims: { shape: 'racetrack', L: 16.0, W: 4.0, iL: 13.4, iW: 1.4, H: 1.2 },
-    applications: ['smartphone-cameras', 'automotive'],
+    applications: ['smartphone-cameras'],
   },
   {
     slug: 'aw-vcm-cw0940', cat: 'vcm-coils', model: 'AW-VCM-CW0940', featured: 1,
@@ -104,7 +104,7 @@ export const products = [
     specs: [s('outline', 'Carrier across flats', '载体对边', '9.40', 'mm'), s('bore', 'Lens bore', '镜筒内径', 'M6.6 × 0.2', ''), s('height', 'Height', '高度', '2.20', 'mm'), s('winding', 'Winding height', '绕线高度', '1.00', 'mm'), s('wire', 'Wire', '线径', '0.040 mm self-bonding'), s('resistance', 'DC resistance @20 °C', '直流电阻 @20 °C', '14.0 ±5%', 'Ω'), s('temp', 'Operating temp.', '工作温度', '−30 to +85', '°C')],
     params: { od: 9.4, h: 2.2, wire: 0.04, r: 14, l: 64, turns: 128 },
     dims: { shape: 'octagon', S: 9.4, D: 6.6, H: 2.2, C: 1.0 },
-    applications: ['smartphone-cameras'],
+    applications: ['smartphone-cameras', 'surveillance-cameras'],
   },
   {
     slug: 'aw-vcm-cx1142', cat: 'vcm-coils', model: 'AW-VCM-CX1142',
@@ -133,7 +133,7 @@ export const products = [
     specs: [s('od', 'Outer diameter', '外径', '12.30', 'mm'), s('id', 'Inner diameter', '内径', '12.00', 'mm'), s('height', 'Height', '高度', '1.80', 'mm'), s('wire', 'Wire', '线径', '0.060 mm CCA self-bonding'), s('layers', 'Layers', '层数', '2'), s('impedance', 'Impedance', '阻抗', '8 ±10%', 'Ω'), s('roundness', 'Roundness', '圆度', '≤ 0.03', 'mm')],
     params: { od: 12.3, h: 1.8, wire: 0.06, r: 7.2, l: 22, turns: 52 },
     dims: { shape: 'ring', OD: 12.3, ID: 12.0, H: 1.8 },
-    applications: ['consumer-audio', 'wearables-haptics'],
+    applications: ['home-devices'],
   },
   {
     slug: 'aw-ac-rf0350', cat: 'air-core-coils', model: 'AW-AC-RF0350',
@@ -147,7 +147,7 @@ export const products = [
     specs: [s('od', 'Outer diameter', '外径', '3.50', 'mm'), s('length', 'Body length', '本体长度', '4.20', 'mm'), s('wire', 'Wire', '线径', '0.50 mm enamelled Cu'), s('turns', 'Turns', '圈数', '6'), s('inductance', 'Inductance @100 MHz', '电感 @100 MHz', '68 ±2%', 'nH'), s('q', 'Q @100 MHz', 'Q 值 @100 MHz', '≥ 120')],
     params: { od: 3.5, h: 4.2, wire: 0.5, r: 0.01, l: 0.068, turns: 6 },
     dims: { shape: 'ring', OD: 3.5, ID: 2.5, H: 4.2 },
-    applications: ['industrial-sensing'],
+    applications: ['radio-induction'],
   },
   {
     slug: 'aw-ac-tc0402', cat: 'air-core-coils', model: 'AW-AC-TC0402',
@@ -175,7 +175,7 @@ export const products = [
     specs: [s('outline', 'Outline (L × W)', '外形 (长 × 宽)', '2.60 × 2.60', 'mm'), s('window', 'Inner window', '内窗', '1.30 × 1.30', 'mm'), s('height', 'Height', '高度', '1.00', 'mm'), s('wire', 'Wire', '线径', '0.030 mm self-bonding'), s('resistance', 'DC resistance @20 °C', '直流电阻 @20 °C', '9.0 ±6%', 'Ω')],
     params: { od: 2.6, h: 1.0, wire: 0.03, r: 9, l: 6.5, turns: 150 },
     dims: { shape: 'racetrack', L: 2.6, W: 2.6, iL: 1.3, iW: 1.3, H: 1.0, r: 0.3 },
-    applications: ['industrial-sensing', 'medical-hearing'],
+    applications: ['optical-pickup', 'medical-hearing'],
   },
   // ---------- Bobbin ----------
   {
@@ -190,7 +190,7 @@ export const products = [
     specs: [s('flange', 'Flange diameter', '法兰直径', '11.50', 'mm'), s('length', 'Bobbin length', '骨架长度', '16.00', 'mm'), s('wire', 'Wire', '线径', '0.080 mm class H'), s('voltage', 'Rated voltage', '额定电压', '12', 'V DC'), s('resistance', 'Coil resistance', '线圈电阻', '400 ±7%', 'Ω'), s('class', 'Insulation class', '绝缘等级', 'H (180 °C)')],
     params: { od: 11.5, h: 16, wire: 0.08, r: 400, l: 380000, turns: 4200 },
     dims: { shape: 'bobbin', D: 11.5, L: 16.0, d: 6.0 },
-    applications: ['automotive', 'industrial-sensing'],
+    applications: ['radio-induction'],
   },
   {
     slug: 'aw-bb-sv2230', cat: 'bobbin-coils', model: 'AW-BB-SV2230', featured: 1,
@@ -204,21 +204,21 @@ export const products = [
     specs: [s('od', 'Outer diameter', '外径', '30.0', 'mm'), s('length', 'Length', '长度', '22.0', 'mm'), s('bore', 'Bore', '内孔', '9.1', 'mm'), s('voltage', 'Rated voltage', '额定电压', '24', 'V DC'), s('power', 'Power', '功率', '4.8', 'W'), s('ip', 'Protection', '防护等级', 'IP67'), s('hipot', 'Dielectric test', '耐压测试', '1,500 V AC / 1 s')],
     params: { od: 30, h: 22, wire: 0.25, r: 120, l: 210000, turns: 2600 },
     dims: { shape: 'bobbin', D: 30.0, L: 22.0, d: 9.1 },
-    applications: ['industrial-sensing'],
+    applications: ['radio-induction'],
   },
   {
     slug: 'aw-bb-sn0812', cat: 'bobbin-coils', model: 'AW-BB-SN0812',
-    name_en: 'Wheel-speed sensor coil', name_zh: '轮速传感器线圈',
-    summary_en: 'Automotive-grade sensing coil, PPAP level 3, −40 to +150 °C.',
-    summary_zh: '车规级感应线圈，PPAP 3 级，−40 至 +150 °C。',
-    body_en: 'Produced on an IATF 16949 line with full traceability to wire lot and winding spindle. Delivered with PPAP, control plan and PFMEA.',
-    body_zh: '在 IATF 16949 产线生产，可追溯至线材批次与绕线主轴。随货提供 PPAP、控制计划与 PFMEA。',
-    custom_en: 'Bobbin from customer tool, resistance window, wire grade 200 °C.',
-    custom_zh: '可使用客户骨架模具，定制电阻窗口，200 °C 线材等级。',
-    specs: [s('flange', 'Flange diameter', '法兰直径', '8.00', 'mm'), s('length', 'Bobbin length', '骨架长度', '12.00', 'mm'), s('wire', 'Wire', '线径', '0.063 mm grade 200'), s('resistance', 'Coil resistance', '线圈电阻', '1,100 ±5%', 'Ω'), s('temp', 'Operating temp.', '工作温度', '−40 to +150', '°C'), s('ppap', 'Documentation', '文件', 'PPAP level 3')],
+    name_en: 'Fine-wire bobbin coil, Ø8 mm', name_zh: '细线骨架线圈 Ø8 mm',
+    summary_en: 'Small high-turn bobbin coil for electronic clocks, solar dancing flowers and induction sensing.',
+    summary_zh: '高圈数小型骨架线圈，用于电子钟表、太阳能摇摆花与电磁感应。',
+    body_en: 'Thousands of turns of fine wire on a moulded bobbin with terminal pins. Resistance is set by the turn count and checked on every part.',
+    body_zh: '在注塑骨架上绕制数千圈细线并带端子针，电阻由圈数决定，并逐颗检测。',
+    custom_en: 'Bobbin from your mould or ours, turns and resistance, pin layout.',
+    custom_zh: '骨架可用客户模具或我方模具，圈数与电阻、端子针布局可定制。',
+    specs: [s('flange', 'Flange diameter', '法兰直径', '8.00', 'mm'), s('length', 'Bobbin length', '骨架长度', '12.00', 'mm'), s('wire', 'Wire', '线径', '0.063 mm'), s('resistance', 'Coil resistance', '线圈电阻', '1,100 ±5%', 'Ω'), s('temp', 'Operating temp.', '工作温度', '−20 to +85', '°C')],
     params: { od: 8, h: 12, wire: 0.063, r: 1100, l: 520000, turns: 3800 },
     dims: { shape: 'bobbin', D: 8.0, L: 12.0, d: 4.2 },
-    applications: ['automotive'],
+    applications: ['home-devices', 'radio-induction'],
   },
   // ---------- Wireless charging coils ----------
   {
@@ -233,7 +233,7 @@ export const products = [
     specs: [s('od', 'Outer diameter', '外径', '50.0', 'mm'), s('id', 'Inner diameter', '内径', '20.0', 'mm'), s('thickness', 'Assembly thickness', '组件厚度', '3.10', 'mm'), s('wire', 'Litz wire', '利兹线', '105 mm × 0.08'), s('inductance', 'Inductance @100 kHz', '电感 @100 kHz', '6.3 ±5%', 'µH'), s('q', 'Q @100 kHz', 'Q 值 @100 kHz', '≥ 75'), s('standard', 'Standard', '标准', 'Qi2 MPP (BPP compatible)')],
     params: { od: 50, h: 3.1, wire: 0.08, r: 0.05, l: 6.3, turns: 11 },
     dims: { shape: 'spiral', OD: 50, ID: 20, T: 3.1 },
-    applications: ['wireless-power', 'automotive'],
+    applications: ['wireless-power'],
   },
   {
     slug: 'aw-wc-rx43', cat: 'wireless-charging-coils', model: 'AW-WC-RX43', featured: 1,
@@ -261,7 +261,7 @@ export const products = [
     specs: [s('od', 'Outer diameter', '外径', '20.0', 'mm'), s('thickness', 'Thickness', '厚度', '0.80', 'mm'), s('wire', 'Litz wire', '利兹线', '30 mm × 0.05'), s('inductance', 'Inductance @200 kHz', '电感 @200 kHz', '11 ±7%', 'µH'), s('power', 'Rated power', '额定功率', '5', 'W')],
     params: { od: 20, h: 0.8, wire: 0.05, r: 0.6, l: 11, turns: 18 },
     dims: { shape: 'spiral', OD: 20, ID: 6, T: 0.8 },
-    applications: ['wireless-power', 'wearables-haptics'],
+    applications: ['wireless-power', 'home-devices'],
   },
   {
     slug: 'aw-wc-dt7650', cat: 'wireless-charging-coils', model: 'AW-WC-DT7650',
@@ -272,24 +272,24 @@ export const products = [
     body_zh: '两个利兹线圈重叠排布在同一张锰锌铁氧体片上，手机放在充电板任何位置都能充电。引线在 Kapton 胶带下集中引出，便于焊接到主板。',
     custom_en: 'Coil overlap, ferrite thickness, lead length and termination.',
     custom_zh: '线圈重叠量、铁氧体厚度、引线长度与端接方式可定制。',
-    specs: [s('outline', 'Outline', '外形', '76 × 50', 'mm'), s('thickness', 'Thickness', '厚度', '2.20', 'mm'), s('wire', 'Litz wire', '利兹线', '60 × 0.08 mm'), s('inductance', 'Inductance per coil @100 kHz', '单线圈电感 @100 kHz', '6.3 ±5%', 'µH'), s('standard', 'Standard', '标准', 'Qi BPP, A28-type layout')],
+    specs: [s('outline', 'Outline', '外形', '76 × 50', 'mm'), s('thickness', 'Thickness', '厚度', '2.20', 'mm'), s('wire', 'Litz wire', '利兹线', '60 × 0.08 mm'), s('inductance', 'Inductance per coil @100 kHz', '单线圈电感 @100 kHz', '6.3 ±5%', 'µH'), s('standard', 'Standard', '标准', 'Qi BPP')],
     params: { od: 76, h: 2.2, wire: 0.08, r: 0.07, l: 6.3, turns: 11 },
     dims: { shape: 'module', L: 76, W: 50, H: 2.2 },
-    applications: ['wireless-power', 'automotive'],
+    applications: ['wireless-power'],
   },
   {
     slug: 'aw-wc-tt9850', cat: 'wireless-charging-coils', model: 'AW-WC-TT9850',
     name_en: 'Three-coil transmitter, 98 × 50 mm', name_zh: '三线圈发射器 98 × 50 mm',
-    summary_en: 'MP-A13-style array: two coils side by side, a third bridging them, for in-car and desk pads.',
-    summary_zh: 'MP-A13 式阵列：两个线圈并排，第三个线圈跨接其上，用于车载与桌面充电板。',
+    summary_en: 'Two coils side by side and a third bridging them, for a large free-placement charging area.',
+    summary_zh: '两个线圈并排、第三个线圈跨接其上，形成更大的自由摆放充电区域。',
     body_en: 'The three-coil array covers a phone placed almost anywhere on the pad. Coils are wound, stacked and bonded to the ferrite in one fixture, so their positions match the controller firmware every time.',
     body_zh: '三线圈阵列几乎覆盖整个充电板的摆放位置。线圈在同一治具中完成绕制、叠放并粘合到铁氧体上，位置每次都与主控固件一致。',
     custom_en: 'Array layout, ferrite outline, lead exit and length.',
     custom_zh: '阵列布局、铁氧体外形、引线出线位置与长度可定制。',
-    specs: [s('outline', 'Outline', '外形', '98 × 50', 'mm'), s('thickness', 'Thickness', '厚度', '3.10', 'mm'), s('wire', 'Litz wire', '利兹线', '60 × 0.08 mm'), s('inductance', 'Inductance per coil @100 kHz', '单线圈电感 @100 kHz', '6.3 ±5%', 'µH'), s('standard', 'Standard', '标准', 'Qi BPP, MP-A13 layout')],
+    specs: [s('outline', 'Outline', '外形', '98 × 50', 'mm'), s('thickness', 'Thickness', '厚度', '3.10', 'mm'), s('wire', 'Litz wire', '利兹线', '60 × 0.08 mm'), s('inductance', 'Inductance per coil @100 kHz', '单线圈电感 @100 kHz', '6.3 ±5%', 'µH'), s('standard', 'Standard', '标准', 'Qi BPP')],
     params: { od: 98, h: 3.1, wire: 0.08, r: 0.07, l: 6.3, turns: 11 },
     dims: { shape: 'module', L: 98, W: 50, H: 3.1 },
-    applications: ['wireless-power', 'automotive'],
+    applications: ['wireless-power'],
   },
   // ---------- Linear motors ----------
   {
@@ -304,7 +304,7 @@ export const products = [
     specs: [s('size', 'Size (L × W × H)', '尺寸 (长 × 宽 × 高)', '35.0 × 8.0 × 3.2', 'mm'), s('f0', 'Resonant frequency', '谐振频率', '170 ±10', 'Hz'), s('accel', 'Acceleration (100 g jig)', '加速度 (100 g 治具)', '≥ 1.6', 'G'), s('resistance', 'Coil resistance', '线圈电阻', '8.0 ±5%', 'Ω'), s('voltage', 'Rated voltage', '额定电压', '2.0', 'Vrms'), s('life', 'Life', '寿命', '≥ 1,000,000 cycles')],
     params: { od: 35, h: 3.2, wire: 0.07, r: 8, l: 380, turns: 220 },
     dims: { shape: 'lra', L: 35, W: 8, H: 3.2 },
-    applications: ['wearables-haptics'],
+    applications: [],
   },
   {
     slug: 'aw-lm-z0825', cat: 'linear-motors', model: 'AW-LM-Z0825',
@@ -318,7 +318,7 @@ export const products = [
     specs: [s('size', 'Size (Ø × H)', '尺寸 (直径 × 高)', '8.0 × 2.5', 'mm'), s('f0', 'Resonant frequency', '谐振频率', '235 ±10', 'Hz'), s('accel', 'Acceleration', '加速度', '≥ 1.2', 'G'), s('resistance', 'Coil resistance', '线圈电阻', '24 ±10%', 'Ω'), s('rise', 'Rise time', '起振时间', '≤ 15', 'ms')],
     params: { od: 8, h: 2.5, wire: 0.05, r: 24, l: 210, turns: 160 },
     dims: { shape: 'coin', D: 8, H: 2.5 },
-    applications: ['wearables-haptics'],
+    applications: [],
   },
   {
     slug: 'aw-lm-dc0218', cat: 'linear-motors', model: 'AW-LM-DC0218',
@@ -332,7 +332,7 @@ export const products = [
     specs: [s('outline', 'Base (L × W)', '底座 (长 × 宽)', '2.30 × 1.80', 'mm'), s('height', 'Height incl. pin', '高度 (含芯销)', '2.40', 'mm'), s('wire', 'Wire', '线径', '0.035 mm'), s('resistance', 'DC resistance @20 °C', '直流电阻 @20 °C', '18 ±7%', 'Ω'), s('mount', 'Mounting', '安装方式', 'SMD, reflow 260 °C')],
     params: { od: 2.3, h: 2.4, wire: 0.035, r: 18, l: 30, turns: 200 },
     dims: { shape: 'bobbin', D: 2.3, L: 2.4, d: 0.52 },
-    applications: ['wearables-haptics'],
+    applications: [],
   },
   // ---------- Wireless chargers ----------
   {
@@ -366,5 +366,5 @@ export const products = [
 ];
 
 export const applications = [
-  'smartphone-cameras', 'wireless-power', 'wearables-haptics', 'automotive', 'industrial-sensing', 'medical-hearing', 'consumer-audio',
+  'smartphone-cameras', 'surveillance-cameras', 'wireless-power', 'optical-pickup', 'medical-hearing', 'home-devices', 'radio-induction',
 ];

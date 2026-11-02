@@ -58,7 +58,7 @@ export function Footer({ locale }: { locale: Locale }) {
       <div className="wrap footer-top">
         <div className="footer-claim">
           <Link href={base} className="brand brand-light"><BrandMark className="brand-mark" /><span className="brand-word">{site.brand}</span></Link>
-          <p>{d.footer.tagline} {zh ? '工厂位于中国东莞与越南北宁。' : 'Plants in Dongguan, China and Bắc Ninh, Vietnam.'}</p>
+          <p>{d.footer.tagline} {zh ? `${site.founded} 年成立，五十余台日特绕线机，月产能两千万颗。` : `Founded ${site.founded}. More than 50 Nittoku winding machines, 20 million coils a month.`}</p>
         </div>
         <div className="footer-cols">
           <div>
@@ -82,7 +82,7 @@ export function Footer({ locale }: { locale: Locale }) {
         </div>
       </div>
       <div className="wrap footer-mega-wrap">
-        <p className="footer-live"><LocalClock label={zh ? '东莞' : 'Dongguan'} running={zh ? '180 条产线运行中' : '180 lines running'} /></p>
+        <p className="footer-live"><LocalClock label={zh ? '东莞' : 'Dongguan'} running={zh ? '五十余台绕线机' : '50+ winding machines'} /></p>
         <div className="footer-mega" data-spot aria-hidden="true">{site.brand}</div>
       </div>
       <div className="wrap footer-base">

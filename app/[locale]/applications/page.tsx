@@ -51,9 +51,9 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
               <div className="story-thumb">{prods[0] && <Render name={productRenderName(prods[0])} alt="" sizes="(max-width: 900px) 100vw, 1px" />}</div>
               <h2>{L(a, 'name', locale)}</h2>
               <p>{L(a, 'lead', locale)}</p>
-              <ul className="story-needs">{(zh ? a.needs_zh : a.needs_en).map((n) => <li key={n}>{n}</li>)}</ul>
+              <ul className="story-needs">{(zh ? a.uses_zh : a.uses_en).map((n) => <li key={n}>{n}</li>)}</ul>
               <div className="story-foot">
-                <div className="chips">{prods.slice(0, 4).map((p) => <Link key={p.slug} href={`${base}/products/${p.category_slug}/${p.slug}`}>{p.model}</Link>)}</div>
+                {prods.length > 0 && <div className="chips">{prods.slice(0, 4).map((p) => <Link key={p.slug} href={`${base}/products/${p.category_slug}/${p.slug}`}>{p.model}</Link>)}</div>}
                 <Link href={`${base}/applications/${a.slug}`} className="btn btn-solid btn-sm btn-arrow">{zh ? '了解详情' : 'Read more'}<svg className="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" /></svg></Link>
               </div>
             </li>

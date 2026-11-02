@@ -14,8 +14,8 @@ function Cover({ a, label }: { a: Article; label: string }) {
   const name = a.products.find(hasRender) || (a.type === 'news' ? pick(['tray', 'spool', 'exploded']) : a.type === 'case' ? 'family-vcm' : pick(['section', 'spool']));
   const scene = ['tray', 'macro-turns'].includes(name);
   return (
-    <span className={`cover cover-${a.type}${scene ? ' cover-scene' : ''}`} aria-hidden="true">
-      <Render name={name} alt="" sizes="(max-width: 900px) 100vw, 40vw" />
+    <span className={`cover cover-${a.type}${scene || a.cover ? ' cover-scene' : ''}`} aria-hidden="true">
+      {a.cover ? <img src={`/api/media/${a.cover}`} alt="" loading="lazy" /> : <Render name={name} alt="" sizes="(max-width: 900px) 100vw, 40vw" />}
       <span className="cover-kind">{label}</span>
     </span>
   );

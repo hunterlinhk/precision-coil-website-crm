@@ -42,7 +42,9 @@ export function seed(db: Database.Database) {
       ['Grace Liu', 'grace.liu@arcwind.example', 'editor', ''],
     ];
     const insUser = db.prepare('INSERT INTO users (name,email,password_hash,role,regions) VALUES (?,?,?,?,?)');
-    users.forEach((u) => insUser.run(u[0], u[1], pw, u[2], u[3]));
+    // DEMO_DATA=0 starts a real installation: only the administrator, the catalogue, articles and logos.
+    const demo = process.env.DEMO_DATA !== '0';
+    (demo ? users : users.slice(0, 1)).forEach((u) => insUser.run(u[0], u[1], pw, u[2], u[3]));
     db.prepare("UPDATE users SET username = 'HunterLin' WHERE email = 'admin@arcwind.example'").run();
     const repFor = (country: string) => (['CN', 'TW', 'HK', 'KR', 'JP'].includes(country) ? 3 : ['VN', 'TH', 'MY', 'SG', 'IN', 'ID', 'PH', 'AU'].includes(country) ? 5 : 4);
 
@@ -67,9 +69,15 @@ export function seed(db: Database.Database) {
       });
     });
 
-    const insArt = db.prepare(`INSERT INTO articles (slug,type,title_en,title_zh,excerpt_en,excerpt_zh,body_en,body_zh,products,applications,reading_min,status,seo_title_en,seo_title_zh,seo_desc_en,seo_desc_zh,created_at,updated_at,published_at)
-      VALUES (@slug,@type,@title_en,@title_zh,@excerpt_en,@excerpt_zh,@body_en,@body_zh,@products,@applications,@reading_min,'published',@title_en,@title_zh,@excerpt_en,@excerpt_zh,@at,@at,@at)`);
-    articles.forEach((a) => insArt.run({ ...a, products: JSON.stringify(a.products), applications: JSON.stringify(a.applications), at: daysAgo(a.days) }));
+    const insArt = db.prepare(`INSERT INTO articles (slug,type,title_en,title_zh,excerpt_en,excerpt_zh,body_en,body_zh,takeaways_en,takeaways_zh,faq,author,products,applications,reading_min,status,seo_title_en,seo_title_zh,seo_desc_en,seo_desc_zh,created_at,updated_at,published_at)
+      VALUES (@slug,@type,@title_en,@title_zh,@excerpt_en,@excerpt_zh,@body_en,@body_zh,@takeaways_en,@takeaways_zh,@faq,@author,@products,@applications,@reading_min,'published',@title_en,@title_zh,@excerpt_en,@excerpt_zh,@at,@at,@at)`);
+    articles.forEach((a) => insArt.run({ ...a, faq: JSON.stringify(a.faq || []), author: a.type === 'news' ? 'Arcwind' : 'Arcwind engineering team', products: JSON.stringify(a.products), applications: JSON.stringify(a.applications), at: daysAgo(a.days) }));
+
+    // ---------- Customer logos (names shown as wordmarks until a logo file is uploaded) ----------
+    const insLogo = db.prepare('INSERT INTO logos (name, sort) VALUES (?, ?)');
+    ['Samsung', 'Apple', 'Xiaomi', 'OPPO', 'vivo', 'Transsion', 'Google'].forEach((n, i) => insLogo.run(n, i));
+
+    if (!demo) return;
 
     // ---------- Accounts & contacts ----------
     const accounts = [
@@ -176,7 +184,7 @@ export function seed(db: Database.Database) {
       quote: ['Please quote 500k pcs/yr against the attached drawing. Target price below USD 0.20.', 'Looking for a second source for our AF coil. Can you quote 3 volume tiers?', 'Need pricing for the listed parts, FOB Shenzhen, MOQ and lead time please.', 'Requesting quotation for annual volume shown, plus tooling cost if any.'],
       sample: ['Could you send 20 samples for evaluation? Shipping to our lab in Munich.', 'We would like samples of the listed models for a design-in starting next month.', 'Please send evaluation kit and datasheets.'],
       drawing: ['Attached is our coil drawing. Is the window tolerance achievable?', 'Can you review this design for manufacturability before we freeze it?', 'We need a custom coil similar to the AF part but 0.2 mm thinner. Drawing attached.'],
-      general: ['Do you have IATF 16949 certificate and can you share the audit report?', 'Is production available in Vietnam for our US programme?', 'Can we visit the factory in November?'],
+      general: ['Can you share your ISO 9001 certificate and RoHS documents?', 'What is your monthly capacity for air-core coils?', 'Can we visit the factory in November?'],
     };
     const models = products.map((p) => p.model);
     const insInq = db.prepare(`INSERT INTO inquiries (type,status,name,email,company,country,phone,role,message,items,annual_volume,target_date,files,nda,source,referrer,landing,utm,locale,owner_id,account_id,first_response_at,created_at)
@@ -239,7 +247,7 @@ export function seed(db: Database.Database) {
       ['Reply to Lumora on periscope pricing', -1, 3, 1, 2, 0],
       ['Chase Kaiyo for quote decision', 2, 3, 2, 3, 0],
       ['Follow up Brightlane sample lab results', 0, 4, 3, 4, 0],
-      ['Send IATF certificate to Hanbit', -3, 3, 7, 10, 0],
+      ['Send ISO 9001 certificate to Hanbit', -3, 3, 7, 10, 0],
       ['Book electronica drawing reviews', 5, 4, null, null, 0],
       ['Prepare Pulseform LRA contract draft', 1, 4, 6, 8, 0],
       ['Corelink: send evaluation kit invoice', 3, 4, 8, 11, 0],

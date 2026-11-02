@@ -11,6 +11,7 @@ import { ArticleList, Breadcrumbs } from '@/components/site/ArticleList';
 import { MiniProducts } from '@/components/site/MiniProducts';
 import { Render } from '@/components/site/Render';
 import { SplitTitle } from '@/components/site/Flair';
+import { appTone } from '@/lib/tones';
 
 type P = { params: Promise<{ locale: Locale; slug: string }> };
 
@@ -38,10 +39,16 @@ export default async function Page({ params }: P) {
             <SplitTitle text={L(a, 'name', locale)} className="h1" />
             <p className="lead">{L(a, 'lead', locale)}</p>
           </div>
-          {prods[0] && <div className="cat-hero-art"><Render name={productRenderName(prods[0])} alt={`${prods[0].model}`} sizes="(max-width: 900px) 100vw, 50vw" priority /></div>}
+          {prods[0] && <div className="cat-hero-art" data-tone={appTone[a.slug]}><Render name={productRenderName(prods[0])} alt={`${prods[0].model}`} sizes="(max-width: 900px) 100vw, 50vw" priority /></div>}
         </div>
       </div>
       <section className="section tight">
+        <div className="wrap split">
+          <h2 className="h2 split-l">{locale === 'zh' ? '我们为此生产的线圈' : 'Coils we make for this'}</h2>
+          <ul className="uses-list split-r" data-stagger>{(locale === 'zh' ? a.uses_zh : a.uses_en).map((u) => <li key={u}>{u}</li>)}</ul>
+        </div>
+      </section>
+      <section className="section tight" style={{ paddingTop: 0 }}>
         <div className="wrap split">
           <h2 className="h2 split-l">{d.apps.needs}</h2>
           <ul className="need-list split-r">{needs.map((n) => <li key={n}>{n}</li>)}</ul>

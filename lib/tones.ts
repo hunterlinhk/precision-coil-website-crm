@@ -13,12 +13,12 @@ export const familyTone: Record<string, Tone> = {
 
 export const appTone: Record<string, Tone> = {
   'smartphone-cameras': 'fog',
+  'surveillance-cameras': 'steel',
   'wireless-power': 'clay',
-  'wearables-haptics': 'lilac',
-  automotive: 'graphite',
-  'industrial-sensing': 'steel',
+  'optical-pickup': 'lilac',
   'medical-hearing': 'mint',
-  'consumer-audio': 'sand',
+  'home-devices': 'sand',
+  'radio-induction': 'graphite',
 };
 
 export const toneOf = (category?: string) => (category && familyTone[category]) || undefined;

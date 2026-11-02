@@ -83,6 +83,32 @@ CREATE TABLE IF NOT EXISTS tasks (
   account_id INTEGER, opportunity_id INTEGER, inquiry_id INTEGER,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+CREATE TABLE IF NOT EXISTS logos (
+  id INTEGER PRIMARY KEY, name TEXT NOT NULL, image TEXT, url TEXT, sort INTEGER DEFAULT 0, visible INTEGER NOT NULL DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
+CREATE TABLE IF NOT EXISTS mail_accounts (
+  id INTEGER PRIMARY KEY, label TEXT, email TEXT NOT NULL, from_name TEXT,
+  smtp_host TEXT, smtp_port INTEGER DEFAULT 465, smtp_secure INTEGER DEFAULT 1, smtp_user TEXT, smtp_pass TEXT,
+  imap_host TEXT, imap_port INTEGER DEFAULT 993, imap_secure INTEGER DEFAULT 1, imap_user TEXT, imap_pass TEXT,
+  owner_id INTEGER, active INTEGER NOT NULL DEFAULT 1, last_uid INTEGER DEFAULT 0, last_sync TEXT, last_error TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE TABLE IF NOT EXISTS emails (
+  id INTEGER PRIMARY KEY, mail_account_id INTEGER, direction TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'sent',
+  message_id TEXT, in_reply_to TEXT, refs TEXT, from_addr TEXT, from_name TEXT, to_addrs TEXT, cc_addrs TEXT,
+  subject TEXT, body_text TEXT, attachments TEXT DEFAULT '[]', error TEXT, imap_uid INTEGER,
+  account_id INTEGER, contact_id INTEGER, inquiry_id INTEGER, user_id INTEGER, read INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE TABLE IF NOT EXISTS pageviews (
+  id INTEGER PRIMARY KEY, ts TEXT NOT NULL DEFAULT (datetime('now')), path TEXT, locale TEXT,
+  visitor TEXT, ref_host TEXT, channel TEXT, utm_source TEXT, utm_campaign TEXT,
+  country TEXT, device TEXT, browser TEXT, os TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_pv_ts ON pageviews(ts);
+CREATE INDEX IF NOT EXISTS idx_mail_msgid ON emails(message_id);
+CREATE INDEX IF NOT EXISTS idx_mail_account ON emails(account_id);
 CREATE INDEX IF NOT EXISTS idx_inq_created ON inquiries(created_at);
 CREATE INDEX IF NOT EXISTS idx_act_account ON activities(account_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_user ON tasks(user_id, done);
@@ -101,9 +127,18 @@ function open() {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   db.exec(SCHEMA);
-  // Older databases: add the sign-in username column.
-  const cols = db.prepare('PRAGMA table_info(users)').all() as { name: string }[];
-  if (!cols.some((c) => c.name === 'username')) db.exec('ALTER TABLE users ADD COLUMN username TEXT');
+  // Older databases: add columns introduced later.
+  const ensure = (table: string, col: string, def: string) => {
+    const cols = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
+    if (!cols.some((c) => c.name === col)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`);
+  };
+  ensure('users', 'username', 'TEXT');
+  ensure('users', 'lang', "TEXT DEFAULT 'en'");
+  ensure('articles', 'takeaways_en', 'TEXT');
+  ensure('articles', 'takeaways_zh', 'TEXT');
+  ensure('articles', 'faq', "TEXT DEFAULT '[]'");
+  ensure('articles', 'cover', 'TEXT');
+  ensure('articles', 'author', 'TEXT');
   db.exec('CREATE UNIQUE INDEX IF NOT EXISTS users_username ON users(username COLLATE NOCASE)');
   const count = db.prepare('SELECT COUNT(*) c FROM users').get() as { c: number };
   if (count.c === 0) {
