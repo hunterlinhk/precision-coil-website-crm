@@ -1,0 +1,11 @@
+node_modules
+.next
+.next-preview
+.preview-data
+preview-out
+.render-cache
+data
+docs
+.git
+*.tsbuildinfo
+.env*

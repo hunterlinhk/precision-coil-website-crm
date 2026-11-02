@@ -11,3 +11,4 @@ next-env.d.ts
 .next-preview/
 preview-out/
 .preview-data/
+data/.secret

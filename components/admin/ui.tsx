@@ -13,6 +13,19 @@ export function Topbar({ title, sub, crumbs, children }: { title: React.ReactNod
   );
 }
 
+// Tabs that are plain links, so each tab has its own URL.
+export function Tabs({ items, label }: { items: { href: string; label: React.ReactNode; current?: boolean; count?: number }[]; label: string }) {
+  return (
+    <nav className="tabs" aria-label={label}>
+      {items.map((t) => <Link key={t.href} href={t.href} aria-current={t.current ? 'page' : undefined}>{t.label}{t.count ? <span className="badge">{t.count}</span> : null}</Link>)}
+    </nav>
+  );
+}
+
+export function Kpi({ label, value, delta, tone }: { label: React.ReactNode; value: React.ReactNode; delta?: React.ReactNode; tone?: 'up' | 'down' | '' }) {
+  return <div className="panel kpi"><div className="label">{label}</div><div className="value">{value}</div>{delta !== undefined && <div className={`delta ${tone || ''}`}>{delta}</div>}</div>;
+}
+
 export const Pill = ({ v, label }: { v: string; label?: string }) => <span className={`pill ${v}`}>{label || v.replace(/_/g, ' ')}</span>;
 
 export function Panel({ title, aside, children, flush }: { title?: React.ReactNode; aside?: React.ReactNode; children: React.ReactNode; flush?: boolean }) {

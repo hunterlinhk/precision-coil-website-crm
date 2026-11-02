@@ -260,6 +260,34 @@ export function seed(db: Database.Database) {
       ['Vossberg relay coil cost-down proposal', -5, 4, 4, 6, 1],
     ];
     tasks.forEach(([t, due, user, acc, opp, done]) => insTask.run(t, due >= 0 ? daysAhead(due) : daysAgo(-due), done, user, acc, opp, daysAgo(10)));
+
+    // ---------- Demo website traffic (only with DEMO_DATA; a clean install starts at zero) ----------
+    const insPv = db.prepare('INSERT INTO pageviews (ts,path,locale,visitor,ref_host,channel,utm_source,country,device,browser,os) VALUES (?,?,?,?,?,?,?,?,?,?,?)');
+    let seed = 7;
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+    const wpick = <T,>(xs: [T, number][]): T => { let r = rnd() * xs.reduce((s, x) => s + x[1], 0); for (const [v, w] of xs) { if ((r -= w) < 0) return v; } return xs[0][0]; };
+    const pages: [string, number][] = [['/en', 30], ['/en/products', 16], ['/en/products/vcm-coils', 10], ['/en/products/vcm-coils/aw-vcm-af0806', 7], ['/en/resources/how-to-specify-a-vcm-coil', 9], ['/en/resources/wireless-charging-tx-coil-notes', 6], ['/en/manufacturing', 6], ['/en/contact', 5], ['/zh', 12], ['/zh/products', 6], ['/zh/resources/nanocrystalline-vs-ferrite-shields', 3]];
+    const src: [[string, string | null], number][] = [[['Google organic', 'www.google.com'], 44], [['Direct', null], 24], [['AI search', 'chatgpt.com'], 8], [['AI search', 'www.perplexity.ai'], 4], [['LinkedIn', 'www.linkedin.com'], 7], [['Baidu', 'www.baidu.com'], 6], [['Referral', 'www.made-in-china.com'], 4], [['Email campaign', null], 3]];
+    const ctry: [string, number][] = [['US', 18], ['CN', 16], ['DE', 10], ['KR', 8], ['JP', 7], ['TW', 7], ['IN', 6], ['VN', 5], ['GB', 4], ['FR', 3]];
+    db.transaction(() => {
+      for (let d = 59; d >= 0; d--) {
+        const weekday = new Date(Date.now() - d * 86400000).getUTCDay();
+        const visitors = Math.round((weekday === 0 || weekday === 6 ? 28 : 52) * (0.8 + rnd() * 0.4) * (1 + (59 - d) / 160));
+        for (let v = 0; v < visitors; v++) {
+          const vid = `demo-${d}-${v}`;
+          const [channel, host] = wpick(src);
+          const country = wpick(ctry);
+          const device = wpick([['desktop', 68], ['mobile', 29], ['tablet', 3]]);
+          const browser = wpick([['Chrome', 62], ['Edge', 14], ['Safari', 16], ['Firefox', 5], ['WeChat', 3]]);
+          const n = 1 + Math.floor(rnd() * 4);
+          for (let k = 0; k < n; k++) {
+            const path = country === 'CN' && k === 0 ? '/zh' : wpick(pages);
+            const ts = new Date(Date.now() - d * 86400000 - Math.floor(rnd() * 20 * 3600000)).toISOString().slice(0, 19).replace('T', ' ');
+            insPv.run(ts, path, path.startsWith('/zh') ? 'zh' : 'en', vid, k === 0 ? host : null, channel, channel === 'Email campaign' ? 'newsletter' : null, country, device, browser, device === 'desktop' ? 'Windows' : 'Android');
+          }
+        }
+      }
+    })();
   });
   tx();
 }

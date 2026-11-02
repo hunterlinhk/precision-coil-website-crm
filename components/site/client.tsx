@@ -131,3 +131,19 @@ export function HeaderScroll() {
   }, []);
   return null;
 }
+
+// Page-view beacon for the built-in, cookie-less analytics. Respects Do Not Track.
+export function PageBeacon({ locale }: { locale: string }) {
+  const path = usePathname();
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_STATIC_PREVIEW === '1') return;
+    try {
+      if (navigator.doNotTrack === '1' || (window as any).globalPrivacyControl) return;
+      const u = new URL(location.href);
+      const utm = ['utm_source', 'utm_medium', 'utm_campaign'].map((k) => (u.searchParams.get(k) ? `${k}=${encodeURIComponent(u.searchParams.get(k)!)}` : '')).filter(Boolean).join('&');
+      const body = JSON.stringify({ p: path, r: document.referrer, l: locale, u: utm });
+      if (!navigator.sendBeacon?.('/api/track', new Blob([body], { type: 'text/plain' }))) fetch('/api/track', { method: 'POST', body, keepalive: true }).catch(() => {});
+    } catch { /* ignore */ }
+  }, [path, locale]);
+  return null;
+}

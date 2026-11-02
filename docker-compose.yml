@@ -1,0 +1,19 @@
+# Production: docker compose up -d   (then put HTTPS in front, e.g. Caddy or nginx)
+services:
+  arcwind:
+    build:
+      context: .
+      args:
+        SITE_URL: https://www.example.com      # your real domain
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      SITE_URL: https://www.example.com        # same as above
+      ADMIN_PASSWORD: change-me-before-first-start
+      APP_SECRET: replace-with-a-long-random-string   # encrypts stored mail passwords and API keys
+      DEMO_DATA: "0"                           # start clean: no sample customers, deals or traffic
+    volumes:
+      - arcwind-data:/data                     # database and uploads: back this up
+volumes:
+  arcwind-data:

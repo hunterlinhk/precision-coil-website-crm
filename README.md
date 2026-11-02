@@ -20,9 +20,9 @@ A bilingual (English / 简体中文) B2B website for a precision coil manufactur
 | **Home** | An animated orthocyclic winding cross-section. Turns are laid layer by layer, then every tenth turn lights up to show the ≈10% VCM share. Followed by product families, the drawing-to-production path, applications, recent articles and a supplier-assessment band. |
 | **Products** | Parametric finder: filter by outline, height, wire diameter and resistance, sort by column, and add parts to a **quote list**. |
 | **Product detail** | Generated dimensioned drawing (third-angle, title block), spec table, customization options, buyer FAQ, documents, related articles. Includes a **printable datasheet** (print or save as PDF). |
-| **Applications** | Seven industries, each with what matters there, how it's handled, and parts to start from. |
+| **Applications** | Seven application groups (19 uses, from phone-camera AF/OIS coils to hearing aids and EV charging), each with what matters there and parts to start from. |
 | **Engineering** | Capability envelope (wire, outline and turns ranges), OEM / ODM / platform models, development timeline. |
-| **Manufacturing** | Written for supplier-qualification teams: facts, plants, equipment, quality system, 12-month metrics, certifications. |
+| **Manufacturing** | Written for supplier-qualification teams: workshop facts, winding and supporting machines, quality system, certifications. |
 | **Resources** | Technical notes, case studies and news. |
 | **Request a quote** | Quote, sample, drawing review or general question. Includes the quote list with quantities, drag-and-drop drawing upload (kept private), and an NDA option. |
 
@@ -30,38 +30,51 @@ A bilingual (English / 简体中文) B2B website for a precision coil manufactur
 
 ### Admin (`/HunterLin`)
 
-![CRM dashboard](docs/screenshots/dash.jpg)
+The admin is fully bilingual: each person switches between **中文** and **EN** at the bottom of the sidebar (or on the sign-in page), and the choice is remembered per person.
 
-**CRM**
-- **Inquiries inbox:** every form submission is captured automatically with its channel (Google, *AI search*, LinkedIn, Baidu, email campaign…), referrer, landing page, files and quote-list items.
-- **Auto-routing:** inquiries are assigned to the rep whose regions include the buyer's country, linked to an existing customer by email domain, and given a follow-up task due within one working day.
-- **First-response tracking**, with SLA highlighting.
-- **Convert** an inquiry into customer + contact + opportunity (and a sample request) in one step.
-- **Customers** with contacts, communication history (calls, emails, meetings, notes), follow-up reminders, quotes, samples and linked inquiries.
-- **Pipeline** board (qualifying → sampling → quoted → negotiation → won/lost) with weighted value.
-- **Quotes** with an editable line-item table, printable quotation document, and status that moves the deal forward when it's sent.
-- **Samples** tracked from request to production, shipment (courier/tracking) and customer feedback.
-- **Analytics:** inquiries per week, conversion funnel, lead sources with conversion rate and pipeline created per channel, top countries, most requested parts, response time by owner.
+![Dashboard](docs/screenshots/dash.jpg)
 
-**CMS**
-- Products and articles edited side by side in English and Chinese, with draft → preview → publish, unpublish, and delete.
-- Spec-table editor, PDF datasheets, parametric filter values, drawing geometry, application tags.
-- **Product photos:** upload (drag and drop), reorder, make any photo the main one, replace a photo in place, or remove it. The main photo replaces the studio render everywhere on the site (catalogue, product page, related products); with several photos the product page shows thumbnails to switch between them. With no photos, the render is used.
-- Search-result preview with title/description length guidance per language.
+Navigation is deliberately short:
+
+| Section | Pages |
+|---|---|
+| Overview | **Dashboard**: inquiries waiting for a reply, unread email, your follow-ups (add and tick them off here), website visitors, Google search snapshot, lead sources |
+| Sales | **Inbox** (website inquiries + email) · **Customers** · **Deals** |
+| Website | **Products** · **News & articles** · **Customer logos** · **Analytics** |
+| Settings | **Email accounts** · **Google Search Console** · **Team & permissions** |
+
+**Sales**
+- **Inbox:** every website inquiry, captured with its channel (Google, *AI search*, LinkedIn, Baidu, email campaign…), referrer, landing page, files and quote-list items. A second tab shows customer email.
+- **Auto-routing:** inquiries go to the rep whose regions include the buyer's country, are linked to an existing customer by email domain, and get a follow-up due within one working day.
+- **Email inside the CRM:** connect company mailboxes (Tencent Exmail, Alibaba Mail, NetEase, Google Workspace, Microsoft 365 or any SMTP/IMAP server). Reply to an inquiry or a customer with attachments; replies are threaded, copied to the mailbox's Sent folder, and incoming mail from known contacts is filed under the right customer automatically. Passwords are stored encrypted.
+- **Customers:** one page per company with its **deals** (stage, value, decision date, and the quotes and samples for each deal, all edited in place), email, notes and call log, contacts, follow-ups and linked inquiries.
+- **Deals** board (qualifying → sampling → quoted → negotiation → won/lost) with weighted value; cards open the deal on the customer page.
+- **Quotes:** editable line items and a printable quotation (print or save as PDF).
+
+**Website**
+- **News & articles editor:** English and 中文 tabs, formatting toolbar, live preview, a *short answer* box (shown as “Key points” and the text AI assistants quote most), FAQ editor (published with FAQ structured data), cover photo, author and date, related products and applications, a Google result preview, and a live **search & AI checklist** per language.
+- **Products:** both languages side by side, spec table, datasheets, filter values, drawing geometry, and **photos** (drag and drop, reorder, replace, remove; the main photo replaces the 3D render everywhere).
+- **Customer logos:** the brand strip under the homepage banner. Add, rename, upload or replace a logo file, reorder, hide or delete. Without a file the name is shown as text.
+- **Analytics:** three tabs.
+  - *Website visitors* — built in, cookie-free and privacy-friendly in the style of the open-source tools [Plausible](https://github.com/plausible/analytics) and [Umami](https://github.com/umami-software/umami): visitors per day, top pages, channels (including AI assistants), referrers, countries, devices. No IP addresses or personal data are stored; bots and “Do Not Track” are skipped.
+  - *Google search* — clicks, impressions, CTR, average position, top search terms, pages and countries from the Google Search Console API (read-only service account; setup steps are on the settings page).
+  - *Sales* — inquiries per week, inquiry → order funnel, lead sources with conversion, top countries and parts, reply time by owner.
 
 **Permissions**
 
 | Role | Can do |
 |---|---|
-| Administrator | Everything, including users and roles |
-| Sales manager | All CRM records, assigns inquiries, edits website content |
-| Sales rep | Own customers and deals plus unassigned inquiries; receives inquiries from their regions |
-| Content editor | Products and articles only, no customer data |
+| Administrator | Everything, including users, permissions and integrations |
+| Sales manager | All customers and deals, assigns inquiries, edits website content |
+| Sales rep | Own customers and deals plus unassigned inquiries; receives inquiries from their regions; can add their own mailbox |
+| Content editor | Products, articles, logos and website analytics; no customer data |
 
 <p>
-  <img src="docs/screenshots/pipe.jpg" width="49%" alt="Pipeline board" />
-  <img src="docs/screenshots/volume.jpg" width="49%" alt="Manufacturing section" />
+  <img src="docs/screenshots/customer.jpg" width="49%" alt="Customer page with deals" />
+  <img src="docs/screenshots/article-editor-zh.jpg" width="49%" alt="Article editor in Chinese" />
 </p>
+
+![Analytics](docs/screenshots/analytics.jpg)
 
 ## Design notes
 
@@ -82,7 +95,7 @@ All motion is CSS and small, dependency-free client components (`components/site
 |---|---|
 | Hero | Headline rises word by word, "One in ten" in moving copper; a **magnifying loupe** follows the cursor over the coil; a live counter of coils wound today (600M/yr ≈ 19 per second); a rotating seal |
 | Macro | Figure counts down from 1.000 to 0.012 mm, image zooms with scroll, a **measuring reticle** reads out X/Y in mm under the cursor, hair ring draws itself |
-| Manufacturing | A **vision-inspection scan** sweeps the production tray and each coil it passes reports PASS with its resistance; facts count up; a dot-matrix map with a shuttle between the two plants |
+| Manufacturing | A **vision-inspection scan** sweeps the production tray and each coil it passes reports PASS with its resistance; facts count up; a machine-floor diagram of the 50+ winding and 30+ supporting machines |
 | Timeline | Gantt bars grow in sequence on graph paper |
 | Exploded view | Callouts pop in one by one; hovering a layer highlights its callout |
 | Applications | Home: a floating preview follows the cursor down the list. Index: a **scroll story**, the sticky stage changes colour and product per industry |
@@ -130,7 +143,9 @@ The same models drive the live 3D viewer on product pages, so a product added in
 - SQLite via `better-sqlite3`: one file, no database server to run
 - No UI framework; hand-written CSS, self-hosted Barlow
 - Auth: scrypt password hashes and HTTP-only session cookies
-- Uploads are stored on disk. Customer drawings are private and only downloadable by signed-in CRM users.
+- Uploads are stored on disk. Customer drawings and email attachments are private and only downloadable by signed-in CRM users.
+- Email: [Nodemailer](https://nodemailer.com) (SMTP), [ImapFlow](https://imapflow.com) (IMAP) and mailparser
+- Visitor analytics: own cookie-free counter with [ua-parser-js](https://github.com/faisalman/ua-parser-js); search data from the Google Search Console API
 
 ## Getting started
 
@@ -160,18 +175,36 @@ The admin lives at **`/HunterLin`** (any capitalisation redirects there). Sign i
 |---|---|---|
 | `SITE_URL` | `https://www.arcwind.example` | Absolute URLs in canonical tags, sitemap, JSON-LD, llms.txt |
 | `ADMIN_PASSWORD` | `arcwind-demo` | Password for the seeded accounts (only read when the database is first created) |
-| `DATA_DIR` | `./data` | Where the SQLite file and uploads live |
+| `DEMO_DATA` | on | Set to `0` for a real installation: only the administrator, catalogue, articles and logos are created; no sample customers, deals, email or traffic |
+| `APP_SECRET` | generated | Key that encrypts stored mail passwords and the Search Console key. If unset, a random key is kept in `DATA_DIR/.secret`; either way, keep it with your backups |
+| `DATA_DIR` | `./data` | Where the SQLite file, uploads and the generated secret live |
 | `INSECURE_COOKIES` | unset | Set to `1` to allow sign-in over plain HTTP in production (local testing only) |
+| `MAIL_ALLOW_SELF_SIGNED` | unset | Set to `1` to accept self-signed certificates on mail servers (test servers only) |
 
 ## Deploying on your own server
 
+The admin needs a running Node server and a disk for the database, so it can't run on GitHub Pages. Any small VPS or cloud VM works (1 vCPU / 1 GB RAM is enough). For a site aimed at buyers in mainland China, a host in Hong Kong or an ICP-registered mainland host keeps the Chinese pages fast.
+
+**With Docker** (recommended):
+
 ```bash
-npm ci
-SITE_URL=https://www.example.com ADMIN_PASSWORD='change-me-now' npm run build
-SITE_URL=https://www.example.com npm start -- -p 3000
+# edit docker-compose.yml first: SITE_URL, ADMIN_PASSWORD, APP_SECRET
+docker compose up -d
 ```
 
-Put it behind nginx or Caddy with HTTPS (session cookies are `Secure` in production), and keep it running with a process manager such as pm2 or systemd. **Back up the `data/` directory**: it holds the database and all uploads. Change every demo password from *Team & permissions* after the first sign-in.
+The database and uploads live in the `arcwind-data` volume. Put Caddy or nginx with HTTPS in front of port 3000.
+
+**Without Docker:**
+
+```bash
+npm ci
+SITE_URL=https://www.example.com ADMIN_PASSWORD='change-me-now' DEMO_DATA=0 npm run build
+SITE_URL=https://www.example.com APP_SECRET='a-long-random-string' npm start -- -p 3000
+```
+
+Keep it running with pm2 or systemd behind nginx or Caddy with HTTPS (session cookies are `Secure` in production).
+
+**After the first start:** sign in at `/HunterLin`, change every password under *Team & permissions*, connect your mailboxes under *Email accounts*, and connect *Google Search Console*. **Back up `DATA_DIR`** (database, uploads and `.secret`).
 
 ## Static preview (GitHub Pages)
 
@@ -185,7 +218,7 @@ This builds with the base path, crawls every page in both languages into `previe
 
 ## Making it a real client's site
 
-1. `lib/site.ts`: name, contacts, address, plants, headline figures, certifications.
+1. `lib/site.ts`: name, contacts, address, headline figures, certifications.
 2. `lib/catalog-seed.ts`, `lib/articles-seed.ts`, `lib/applications.ts`: starting catalogue, articles and industries (or delete the seed data and add content from the admin).
 3. `lib/i18n.ts`: all interface copy in both languages.
 4. `public/icon.svg` and the `BrandMark` component: the logo.

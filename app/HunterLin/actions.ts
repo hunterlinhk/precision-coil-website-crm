@@ -2,7 +2,9 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { db, j, now } from '@/lib/db';
-import { login, logout, requireUser, can, type User } from '@/lib/auth';
+import { login, logout, requireUser, currentUser, can, type User } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { ADMIN_LANG_COOKIE } from '@/lib/admin-lang';
 import { hashPassword } from '@/lib/password';
 import { logActivity, inquiryRef } from '@/lib/crm';
 import { saveUpload } from '@/lib/uploads';
@@ -23,9 +25,23 @@ function guard(u: User, table: string, rowId: number) {
   return row;
 }
 
+// ---------------- Interface language ----------------
+export async function setAdminLang(l: 'en' | 'zh') {
+  const lang = l === 'zh' ? 'zh' : 'en';
+  (await cookies()).set(ADMIN_LANG_COOKIE, lang, { path: '/', maxAge: 31536000, sameSite: 'lax' });
+  const u = await currentUser();
+  if (u) db().prepare('UPDATE users SET lang = ? WHERE id = ?').run(lang, u.id);
+}
+
 // ---------------- Auth ----------------
 export async function loginAction(fd: FormData) {
   const ok = await login(s(fd, 'username') || s(fd, 'email'), String(fd.get('password') ?? ''));
+  if (ok) {
+    const id = s(fd, 'username') || s(fd, 'email');
+    const row = db().prepare('SELECT lang FROM users WHERE lower(email) = lower(?) OR lower(username) = lower(?)').get(id, id) as { lang?: string } | undefined;
+    const jar = await cookies();
+    if (row?.lang && !jar.get(ADMIN_LANG_COOKIE)) jar.set(ADMIN_LANG_COOKIE, row.lang, { path: '/', maxAge: 31536000, sameSite: 'lax' });
+  }
   redirect(ok ? '/HunterLin' : '/HunterLin/login?error=1');
 }
 export async function logoutAction() {
@@ -93,7 +109,8 @@ export async function convertInquiry(fd: FormData) {
     return oppId;
   });
   const oppId = tx();
-  redirect(`/HunterLin/opportunities/${oppId}?converted=1`);
+  const acc = (db().prepare('SELECT account_id FROM opportunities WHERE id = ?').get(oppId) as any).account_id;
+  redirect(`/HunterLin/accounts/${acc}?converted=1#deal-${oppId}`);
 }
 
 // ---------------- Activities & tasks ----------------
@@ -116,14 +133,14 @@ export async function createTask(fd: FormData) {
   const title = s(fd, 'title', 200);
   if (title) db().prepare('INSERT INTO tasks (title,due_at,user_id,account_id,opportunity_id,created_at) VALUES (?,?,?,?,?,?)')
     .run(title, s(fd, 'due') ? `${s(fd, 'due')} 09:00:00` : null, assignee, id(fd, 'account_id') || null, id(fd, 'opportunity_id') || null, now());
-  redirect(s(fd, 'back') || '/HunterLin/tasks');
+  redirect(s(fd, 'back') || '/HunterLin');
 }
 
 export async function toggleTask(fd: FormData) {
   const u = await requireUser();
   const t = db().prepare('SELECT user_id, done FROM tasks WHERE id = ?').get(id(fd)) as any;
   if (t && (t.user_id === u.id || can.seeAll(u))) db().prepare('UPDATE tasks SET done = ? WHERE id = ?').run(t.done ? 0 : 1, id(fd));
-  redirect(s(fd, 'back') || '/HunterLin/tasks');
+  redirect(s(fd, 'back') || '/HunterLin');
 }
 
 // ---------------- Accounts & contacts ----------------
@@ -183,13 +200,13 @@ export async function saveOpportunity(fd: FormData) {
       logActivity({ account_id: cur.account_id, opportunity_id: oid, user_id: u.id, kind: 'status', body: `Stage changed from ${cur.stage} to ${stage}.` });
       if (stage === 'won') db().prepare(`UPDATE accounts SET stage = 'customer' WHERE id = ?`).run(cur.account_id);
     }
-    redirect(back || `/HunterLin/opportunities/${oid}?saved=1`);
+    redirect(back || `/HunterLin/accounts/${cur.account_id}?saved=1#deal-${oid}`);
   }
   guard(u, 'accounts', aid);
   const newId = Number(db().prepare('INSERT INTO opportunities (account_id,title,stage,value,owner_id,expected_close,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)')
     .run(aid, s(fd, 'title', 200) || 'New opportunity', s(fd, 'stage') || 'qualifying', n(fd, 'value'), u.role === 'sales' ? u.id : (id(fd, 'owner_id') || u.id), nullable(s(fd, 'expected_close')), now(), now()).lastInsertRowid);
   logActivity({ account_id: aid, opportunity_id: newId, user_id: u.id, kind: 'status', body: 'Opportunity created.' });
-  redirect(`/HunterLin/opportunities/${newId}`);
+  redirect(s(fd, 'back') || `/HunterLin/accounts/${aid}#deal-${newId}`);
 }
 
 // ---------------- Quotes ----------------
@@ -237,7 +254,7 @@ export async function createSample(fd: FormData) {
     .run(opp.account_id, oid, s(fd, 'model', 40), parseInt(s(fd, 'qty'), 10) || 10, 'requested', opp.owner_id || u.id, now());
   if (['qualifying'].includes(opp.stage)) db().prepare(`UPDATE opportunities SET stage = 'sampling', updated_at = ? WHERE id = ?`).run(now(), oid);
   logActivity({ account_id: opp.account_id, opportunity_id: oid, user_id: u.id, kind: 'status', body: `Sample request logged: ${s(fd, 'qty')} × ${s(fd, 'model')}.` });
-  redirect(`/HunterLin/opportunities/${oid}`);
+  redirect(`/HunterLin/accounts/${opp.account_id}#deal-${oid}`);
 }
 
 export async function updateSample(fd: FormData) {
@@ -249,7 +266,7 @@ export async function updateSample(fd: FormData) {
   db().prepare('UPDATE samples SET status=?, courier=?, tracking=?, feedback=?, shipped_at = CASE WHEN ? = ? AND shipped_at IS NULL THEN ? ELSE shipped_at END WHERE id = ?')
     .run(status, fd.has('courier') ? s(fd, 'courier', 40) : cur.courier, fd.has('tracking') ? s(fd, 'tracking', 60) : cur.tracking, fd.has('feedback') ? s(fd, 'feedback', 2000) : cur.feedback, status, 'shipped', now(), sid);
   if (status !== cur.status) logActivity({ account_id: cur.account_id, opportunity_id: cur.opportunity_id, user_id: u.id, kind: 'status', body: `Sample ${cur.model} marked ${status.replace('_', ' ')}.` });
-  redirect(s(fd, 'back') || '/HunterLin/samples');
+  redirect(s(fd, 'back') || `/HunterLin/accounts/${cur.account_id}${cur.opportunity_id ? `#deal-${cur.opportunity_id}` : ''}`);
 }
 
 // ---------------- CMS: products ----------------
@@ -318,6 +335,12 @@ export async function deleteProduct(fd: FormData) {
 }
 
 // ---------------- CMS: articles ----------------
+// Reading time: about 220 English words, or 400 Chinese characters, a minute.
+function readingMinutes(en: string, zh: string) {
+  const w = en.split(/\s+/).filter(Boolean).length / 220;
+  const c = zh.replace(/\s/g, '').length / 400;
+  return Math.max(1, Math.round(Math.max(w, c)));
+}
 export async function saveArticle(fd: FormData) {
   await requireUser(can.cms);
   const aid = id(fd);
@@ -329,23 +352,35 @@ export async function saveArticle(fd: FormData) {
   let status = cur?.status || 'draft';
   if (intent === 'publish') status = 'published';
   if (intent === 'unpublish') status = 'draft';
-  const words = (s(fd, 'body_en', 40000).split(/\s+/).length) || 200;
+  // Cover photo: keep, replace or remove.
+  let cover: string | null = cur?.cover || null;
+  if (fd.get('cover_remove')) cover = null;
+  const cf = fd.get('cover_file');
+  if (cf instanceof File && cf.size) { const st = await saveUpload(cf, 'public'); if (st && /\.(png|jpe?g|webp|gif)$/i.test(st.id)) cover = st.id; }
+  // FAQ: JSON rows from the editor, [question EN, answer EN, question ZH, answer ZH].
+  let faq: string[][] = [];
+  try { faq = (JSON.parse(s(fd, 'faq', 20000) || '[]') as string[][]).map((r) => [0, 1, 2, 3].map((i) => String(r[i] || '').trim().slice(0, 1200))).filter((r) => (r[0] && r[1]) || (r[2] && r[3])).slice(0, 12); } catch { faq = j(cur?.faq, []); }
+  const pubDate = s(fd, 'published_date');
+  const body_en = s(fd, 'body_en', 40000), body_zh = s(fd, 'body_zh', 40000);
   const row = {
     slug, type: ['news', 'tech', 'case'].includes(s(fd, 'type')) ? s(fd, 'type') : 'news',
     title_en: s(fd, 'title_en', 240), title_zh: s(fd, 'title_zh', 240), excerpt_en: s(fd, 'excerpt_en', 600), excerpt_zh: s(fd, 'excerpt_zh', 600),
-    body_en: s(fd, 'body_en', 40000), body_zh: s(fd, 'body_zh', 40000), products: JSON.stringify(fd.getAll('products').map(String)),
-    applications: JSON.stringify(fd.getAll('applications').map(String)), reading_min: Math.max(1, Math.round(words / 220)), status,
+    body_en, body_zh, products: JSON.stringify(fd.getAll('products').map(String)),
+    applications: JSON.stringify(fd.getAll('applications').map(String)), reading_min: readingMinutes(body_en, body_zh), status,
     seo_title_en: s(fd, 'seo_title_en', 200), seo_title_zh: s(fd, 'seo_title_zh', 200), seo_desc_en: s(fd, 'seo_desc_en', 400), seo_desc_zh: s(fd, 'seo_desc_zh', 400),
-    updated_at: now(), published_at: status === 'published' ? (cur?.published_at || now()) : cur?.published_at || null,
+    takeaways_en: s(fd, 'takeaways_en', 1200), takeaways_zh: s(fd, 'takeaways_zh', 1200), faq: JSON.stringify(faq),
+    cover, author: s(fd, 'author', 120),
+    updated_at: now(),
+    published_at: /^\d{4}-\d{2}-\d{2}$/.test(pubDate) ? `${pubDate} ${(cur?.published_at || '').slice(11, 19) || '08:00:00'}` : status === 'published' ? (cur?.published_at || now()) : cur?.published_at || null,
   };
   let out = aid;
   if (aid) {
     db().prepare(`UPDATE articles SET slug=@slug, type=@type, title_en=@title_en, title_zh=@title_zh, excerpt_en=@excerpt_en, excerpt_zh=@excerpt_zh, body_en=@body_en, body_zh=@body_zh,
       products=@products, applications=@applications, reading_min=@reading_min, status=@status, seo_title_en=@seo_title_en, seo_title_zh=@seo_title_zh, seo_desc_en=@seo_desc_en, seo_desc_zh=@seo_desc_zh,
-      updated_at=@updated_at, published_at=@published_at WHERE id = @id`).run({ ...row, id: aid });
+      takeaways_en=@takeaways_en, takeaways_zh=@takeaways_zh, faq=@faq, cover=@cover, author=@author, updated_at=@updated_at, published_at=@published_at WHERE id = @id`).run({ ...row, id: aid });
   } else {
-    out = Number(db().prepare(`INSERT INTO articles (slug,type,title_en,title_zh,excerpt_en,excerpt_zh,body_en,body_zh,products,applications,reading_min,status,seo_title_en,seo_title_zh,seo_desc_en,seo_desc_zh,updated_at,published_at)
-      VALUES (@slug,@type,@title_en,@title_zh,@excerpt_en,@excerpt_zh,@body_en,@body_zh,@products,@applications,@reading_min,@status,@seo_title_en,@seo_title_zh,@seo_desc_en,@seo_desc_zh,@updated_at,@published_at)`).run(row).lastInsertRowid);
+    out = Number(db().prepare(`INSERT INTO articles (slug,type,title_en,title_zh,excerpt_en,excerpt_zh,body_en,body_zh,products,applications,reading_min,status,seo_title_en,seo_title_zh,seo_desc_en,seo_desc_zh,takeaways_en,takeaways_zh,faq,cover,author,updated_at,published_at)
+      VALUES (@slug,@type,@title_en,@title_zh,@excerpt_en,@excerpt_zh,@body_en,@body_zh,@products,@applications,@reading_min,@status,@seo_title_en,@seo_title_zh,@seo_desc_en,@seo_desc_zh,@takeaways_en,@takeaways_zh,@faq,@cover,@author,@updated_at,@published_at)`).run(row).lastInsertRowid);
   }
   revalidatePath('/', 'layout');
   redirect(`/HunterLin/articles/${out}?saved=${intent || 'save'}`);

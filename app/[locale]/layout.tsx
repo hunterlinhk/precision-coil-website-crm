@@ -9,7 +9,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata, Viewport } from 'next';
 import { isLocale, site, type Locale } from '@/lib/site';
 import { Header, Footer } from '@/components/site/Chrome';
-import { RfqProvider, SourceTracker } from '@/components/site/client';
+import { RfqProvider, SourceTracker, PageBeacon } from '@/components/site/client';
 import { orgJsonLd, JsonLd } from '@/lib/seo';
 import { Motion, motionBootScript } from '@/components/site/motion';
 import { withBase } from '@/lib/base';
@@ -46,6 +46,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
           <Footer locale={locale as Locale} />
         </RfqProvider>
         <SourceTracker />
+        <PageBeacon locale={locale} />
         <Motion />
         <JsonLd data={orgJsonLd(locale as Locale)} />
       </body>

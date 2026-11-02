@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 type Line = { model: string; qty: number; unit: number };
 
-export function QuoteLines({ initial, models, currency, readOnly }: { initial: Line[]; models: string[]; currency: string; readOnly?: boolean }) {
+export function QuoteLines({ initial, models, currency, readOnly, addLabel = 'Add line' }: { initial: Line[]; models: string[]; currency: string; readOnly?: boolean; addLabel?: string }) {
   const [lines, setLines] = useState<Line[]>(initial.length ? initial : [{ model: '', qty: 0, unit: 0 }]);
   const total = lines.reduce((s, l) => s + (+l.qty || 0) * (+l.unit || 0), 0);
   const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 2 }).format(v);
@@ -27,11 +27,11 @@ export function QuoteLines({ initial, models, currency, readOnly }: { initial: L
           <tr><td colSpan={3} className="r"><strong>Total</strong></td><td className="r"><strong>{fmt(total)}</strong></td>{!readOnly && <td />}</tr>
         </tbody>
       </table>
-      {!readOnly && <button type="button" className="btn btn-sm no-print" style={{ marginTop: 10 }} onClick={() => setLines([...lines, { model: '', qty: 0, unit: 0 }])}>Add line</button>}
+      {!readOnly && <button type="button" className="btn btn-sm no-print" style={{ marginTop: 10 }} onClick={() => setLines([...lines, { model: '', qty: 0, unit: 0 }])}>{addLabel}</button>}
     </div>
   );
 }
 
-export function PrintBtn() {
-  return <button type="button" className="btn" onClick={() => window.print()}>Print or save PDF</button>;
+export function PrintBtn({ label = 'Print or save PDF' }: { label?: string }) {
+  return <button type="button" className="btn" onClick={() => window.print()}>{label}</button>;
 }

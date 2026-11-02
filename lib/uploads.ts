@@ -28,3 +28,12 @@ export function readUpload(id: string, visibility: 'public' | 'private') {
   if (!fs.existsSync(p)) return null;
   return { body: fs.readFileSync(p), type: TYPES[path.extname(id)] || 'application/octet-stream' };
 }
+
+// Save raw bytes (e.g. an email attachment). Unknown types are stored as .bin and only ever served as downloads.
+export function saveBuffer(name: string, buf: Buffer, visibility: 'public' | 'private'): Stored | null {
+  if (!buf?.length || buf.length > MAX_UPLOAD) return null;
+  const ext = ALLOWED.test(name) ? path.extname(name).toLowerCase() : '.bin';
+  const id = crypto.randomBytes(12).toString('hex') + ext;
+  fs.writeFileSync(path.join(UPLOAD_DIR, visibility, id), buf);
+  return { id, name: path.basename(name || 'attachment').slice(0, 140), size: buf.length };
+}
